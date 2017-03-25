@@ -1,0 +1,15 @@
+{
+	"name": "lab",
+	"version": "0.1.0",
+	"main": "index.js",
+	"license": "MIT",
+	"devDependencies": {
+		"babel-preset-flow": "^6.23.0",
+		"babel-preset-latest": "^6.24.0",
+		"babel-register": "^6.24.0"
+	},
+	"dependencies": {
+		"express": "^4.15.2",
+		"spdy": "^3.4.4"
+	}
+}
