@@ -1,0 +1,6 @@
+map: inline
+plugins:
+    stylelint: {}
+    postcss-cssnext: {}
+    cssnano: {}
+    postcss-reporter: {}

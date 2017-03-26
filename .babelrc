@@ -1,5 +1,5 @@
 {
-	"presets": ["latest", "flow", "stage-0"],
+	"presets": ["latest", "flow", "stage-0", "babili"],
 	"plugins": [
     	"transform-custom-element-classes",
   	]
