@@ -1,0 +1,17 @@
+:host {
+	--main-color: cadetblue;
+
+	margin: auto;
+	display: flex;
+	flex-direction: column;
+}
+
+body {
+	display: flex;
+}
+
+input {
+	font-size: 20px;
+	border: none;
+	box-shadow: 0 0 0 2px var(--main-color);
+}

@@ -20,7 +20,9 @@ export function es5 () {
 		.pipe(eslint())
 		.pipe(eslint.format())
 		.pipe(eslint.failAfterError())
-		.pipe(babel())
+		.pipe(babel({
+			sourceMaps: 'inline'
+		}))
 		.pipe(gulp.dest(paths.dest))
 }
 
