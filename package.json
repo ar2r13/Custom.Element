@@ -4,12 +4,21 @@
 	"main": "index.js",
 	"license": "MIT",
 	"devDependencies": {
+		"babel-eslint": "^7.2.1",
+		"babel-plugin-transform-custom-element-classes": "^0.1.0",
 		"babel-preset-flow": "^6.23.0",
-		"babel-preset-latest": "^6.24.0",
-		"babel-register": "^6.24.0"
+		"babel-preset-latest": "latest",
+		"babel-preset-stage-0": "latest",
+		"babel-register": "^6.24.0",
+		"eslint": "^3.18.0",
+		"eslint-plugin-flowtype": "^2.30.4"
 	},
 	"dependencies": {
 		"express": "^4.15.2",
 		"spdy": "^3.4.4"
+	},
+	"scripts": {
+		"start": "npm run build && babel-node index.js",
+		"build": "babel app -d dist -D -m -s inline"
 	}
 }

@@ -1,3 +1,6 @@
 {
-	"presets": ["flow", "latest"],
+	"presets": ["latest", "flow", "stage-0"],
+	"plugins": [
+    	"transform-custom-element-classes",
+  	]
 }
