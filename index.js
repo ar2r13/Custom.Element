@@ -13,7 +13,8 @@ const options = {
 }
 
 server.use(express.static('dist'))
+server.use('/polyfil',  express.static('node_modules/wc-polyfil/'))
 
 http2.createServer(options, server).listen(port, _ => {
-	console.log('He\'s ALIVE!')
+	console.log('Hosted on port: ' + port)
 })
