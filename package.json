@@ -28,6 +28,7 @@
 		"spdy": "^3.4.4"
 	},
 	"scripts": {
-		"start": "babel-node index.js"
+		"start": "babel-node index.js",
+		"gulp": "./node_modules/gulp/bin/gulp.js"
 	}
 }
