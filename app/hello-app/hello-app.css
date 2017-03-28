@@ -1,6 +1,8 @@
-:host {
+:root {
 	--main-color: cadetblue;
+}
 
+:host {
 	margin: auto;
 	display: flex;
 	flex-direction: column;

@@ -10,7 +10,6 @@ module.exports = {
     },
     "extends": [
         "eslint:recommended",
-        "plugin:flowtype/recommended"
     ],
     "parserOptions": {
         "sourceType": "module"
@@ -37,5 +36,49 @@ module.exports = {
 			2,
 			{ "args": "none" }
 		],
-    }
+		"flowtype/boolean-style": [
+			"error",
+			"boolean"
+		],
+		"flowtype/generic-spacing": [
+			"error",
+			"never"
+		],
+		"flowtype/require-parameter-type": [
+			"error",
+			{
+				"excludeArrowFunctions": "expressionsOnly"
+			}
+		],
+		"flowtype/require-return-type": [
+            2,
+            "always",
+            {
+              "excludeArrowFunctions": "expressionsOnly"
+            }
+        ],
+		"flowtype/require-variable-type": [
+            2,
+            {
+              "excludeVariableTypes": {
+            	"var": true,
+                "let": true,
+                "const": false,
+              }
+            }
+        ],
+		"flowtype/space-after-type-colon": [
+			"error",
+			"always"
+		],
+		"flowtype/space-before-type-colon": [
+			"error",
+			"always"
+		]
+    },
+	"settings": {
+    	"flowtype": {
+			"onlyFilesWithFlowAnnotation": true
+		}
+	}
 };

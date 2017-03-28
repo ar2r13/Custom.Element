@@ -1,5 +1,5 @@
 [ignore]
-node_modules
+.*/node_modules/.*
 
 [include]
 
@@ -7,3 +7,4 @@ node_modules
 
 [options]
 emoji=true
+unsafe.enable_getters_and_setters=true

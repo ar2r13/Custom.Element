@@ -3,17 +3,17 @@ import babel from 'gulp-babel'
 import postcss from 'gulp-postcss'
 import eslint from 'gulp-eslint'
 import htmlMinify from 'gulp-htmlmin'
-import nodemon from 'gulp-nodemon'
+import server from 'gulp-develop-server'
 
 const paths = {
 	styles: 'app/**/*.css',
 	scripts: 'app/**/*.js',
 	html: 'app/**/*.html',
-	dest: 'dist'
+	dest: 'public'
 }
 
 export const build = gulp.parallel(es5, css, html)
-export const start = gulp.parallel(serve, gulp.series(build, watch))
+export const start = gulp.series(build, gulp.parallel(serve, watch))
 
 export function es5 () {
 	return gulp.src(paths.scripts)
@@ -44,12 +44,12 @@ export function watch () {
 	gulp.watch(paths.scripts, es5)
 	gulp.watch(paths.styles, css)
 	gulp.watch(paths.html, html)
+	gulp.watch('index.js', server.restart)
 }
 
 export function serve() {
-	nodemon({
-		script: 'index.js',
-		exec: 'babel-node'
+	server.listen({
+		path: 'index.js'
 	})
 }
 
