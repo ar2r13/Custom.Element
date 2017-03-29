@@ -4,7 +4,13 @@
 class WebComponent extends HTMLElement {
 
 	_template : HTMLTemplateElement
+
 	shadow : ShadowRoot
+
+	constructor() {
+		super()
+		this._attachShadow()
+	}
 
 	get template () : HTMLTemplateElement {
 		if(!this._template) this.template = void 0
@@ -15,17 +21,11 @@ class WebComponent extends HTMLElement {
 		this._template = this._document().querySelector(selector).content.cloneNode(true)
 	}
 
-	constructor() {
-		super()
-		this._attachShadow()
-	}
-
-	connectedCallback() {
-		
-	}
-
-	disconnectedCallback() {
-
+	_attachShadow() {
+		if(!this.shadow) {
+			this.shadow = this.attachShadow({mode: 'open'})
+		}
+		this.shadow.appendChild(this.template)
 	}
 
 	attributeChangedCallback(attr : string, oldValue : string, newValue : string) {
@@ -36,11 +36,6 @@ class WebComponent extends HTMLElement {
 		return document.currentScript
 			? document.currentScript.ownerDocument
 			: document._currentScript.ownerDocument
-	}
-
-	_attachShadow() {
-		this.shadow = this.attachShadow({mode: 'open'})
-		this.shadow.appendChild(this.template)
 	}
 
 }
