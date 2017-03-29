@@ -6,6 +6,29 @@ class HelloApp extends window.WebComponent {
 
 	constructor() {
 		super()
+		this._findAccessors()
+	}
+
+	_findAccessors() {
+		const nodes = this.shadow.children
+		const regex = /([^\[\[]*?)(?=\]\])/gim
+		for(let node of nodes) {
+			const accessor = node.innerText.match(regex)
+			if(accessor) {
+				this[`_${accessor[0]}`] = this[accessor[0]]
+				Object.defineProperty(this, accessor[0], {
+					set: function (newValue) {
+						if(this[`_${accessor[0]}`] === newValue) return
+						this[`_${accessor[0]}`] = newValue
+						node.innerText = newValue
+					},
+					get: function() {
+						return this[`_${accessor[0]}`]
+					}
+				})
+				node.innerText = this[accessor[0]] || ''
+			}
+		}
 	}
 
 	connectedCallback() {
@@ -15,10 +38,7 @@ class HelloApp extends window.WebComponent {
 	}
 
 	_update() {
-		let value = this._input.value
-		this._string.innerHTML = value
-			? 'Hello my name is: ' + value
-			: ''
+		this.userName = this._input.value
 	}
 
 	disconnectedCallback() {
