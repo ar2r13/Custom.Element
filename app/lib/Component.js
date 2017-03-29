@@ -21,8 +21,7 @@ class WebComponent extends HTMLElement {
 	}
 
 	connectedCallback() {
-		let a : Array<boolean> = [false]
-		console.log(a.length)
+		
 	}
 
 	disconnectedCallback() {
