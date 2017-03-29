@@ -6,6 +6,7 @@
 		"babili"
 	],
 	"plugins": [
-    	"transform-custom-element-classes"
+    	"transform-custom-element-classes",
+		"transform-decorators-legacy"
   	]
 }
