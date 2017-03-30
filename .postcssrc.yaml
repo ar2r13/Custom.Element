@@ -1,6 +1,8 @@
 map: inline
 plugins:
     stylelint: {}
-    postcss-cssnext: {}
+    postcss-cssnext: {
+        warnForDuplicates: false
+        }
     cssnano: {}
     postcss-reporter: {}
