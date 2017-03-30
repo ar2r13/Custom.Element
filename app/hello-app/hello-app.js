@@ -11,7 +11,7 @@ class HelloApp extends window.WebComponent {
 	connectedCallback() {
 		this._input = this.shadow.querySelector('input')
 		this._string = this.shadow.querySelector('span')
-		this._input.addEventListener('input', this::this._update)
+		this._input.addEventListener('input', ::this._update)
 	}
 
 	_update() {
