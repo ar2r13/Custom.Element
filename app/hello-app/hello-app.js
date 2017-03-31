@@ -4,6 +4,7 @@ class HelloApp extends window.WebComponent {
 
 	static is = 'hello-app'
 	userName = 'Bruce Wayne'
+	hero = 'Batman'
 
 	constructor() {
 		super()
@@ -14,6 +15,15 @@ class HelloApp extends window.WebComponent {
 		this._string = this.shadow.querySelector('span')
 		this._input.value = this.userName
 		this._input.addEventListener('input', ::this._update)
+	}
+
+	__bench(name, count) {
+		console.time(name)
+		for(let i = 0; i < count; i++) {
+			this.userName = i
+			this.people24 = i
+		}
+		console.timeEnd(name)
 	}
 
 	_update() {

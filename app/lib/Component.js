@@ -4,61 +4,80 @@
 class WebComponent extends HTMLElement {
 
 	_template : HTMLTemplateElement
+	_stampNodes : Object = {}
 	shadow : ShadowRoot
 
 	constructor() {
 		super()
 		this._attachShadow()
-		this._analyzeDom()
+		this._detectStamps()
 	}
 
-	_analyzeDom() {
-		const nodes : Array<Object> = this._allNodes(this.shadow.childNodes)
-		const regexp : RegExp = /\[\[\s*([^\W+\d+\W+]\w+)\s*]]/gim
+	_detectStamps() {
+		const nodes : Array<Object> = this._allNodes()
+		const stampSelector : RegExp = /(\[\[\s*[^\W+\d+\W+]\w*\s*]])/gim
+		const stampTest : RegExp = /\[\[\s*([^\W+\d+\W+]\w*)\s*]]/i
 
 		for(let node of nodes) {
 			if(!node.data || node.nodeType !== 3) continue
 
-			const stamps : Array<[]> = []
-			let stamp : Array<mixed>
+			const chunks : Array<string> = node.data.split(stampSelector)
 
-			while ((stamp = regexp.exec(node.data))) {
-				stamps.push(stamp)
-			}
+			if(!chunks.length) continue
 
-			if(stamps.length) {
-				stamps.forEach(_stamp => this._bindStamp(_stamp, _stamp.input))
-			}
+			const parentNode : Object = node.parentNode
+			const nextNode : Object = node.nextSibling
+
+			node.remove()
+
+			chunks.forEach((chunck : string) => {
+				const test : any = chunck.match(stampTest)
+				const prop : string = test ? test[1] : test
+				const data : string = prop ? '' : chunck
+				const newNode : Text = document.createTextNode(data)
+
+				if(prop) {
+					const _stampNodes : Array<Text> = this._stampNodes[prop]
+					_stampNodes instanceof Array
+						? _stampNodes.push(newNode)
+						: this._stampNodes[prop] = [newNode]
+				}
+
+				parentNode.insertBefore(newNode, nextNode)
+			})
+		}
+		this._stampProps()
+	}
+
+	_stampProps() {
+		const stampProps : Array<string> = Object.keys(this._stampNodes)
+
+		for(let prop of stampProps) {
+			const _prop : string = '_' + prop
+
+			Object.defineProperty(this, _prop, { writable: true })
+			Object.defineProperty(this, prop, {
+				enumerable: true,
+				get: function () : String {
+					return this[_prop]
+				},
+				set: function(value : string | number) {
+					if(this[_prop] === value) return
+					this[_prop] = value
+					this._stampNodes[prop].forEach(node => node.data = value || '')
+				}
+			})
 		}
 	}
 
-	_bindStamp([stamp, prop] : Array<string> = stamp, input : String, node : Object) {
-		const _prop : String = '_' + prop
-
-		Object.defineProperty(this, _prop, { writable: true })
-		Object.defineProperty(this, prop, {
-			enumerable: true,
-			get: function () : String {
-				return this[_prop]
-			},
-			set: function(value : String) {
-				if(this[_prop] === value) return
-				this[_prop] = value
-				// node.data = input.replace(regexp, ())
-			}
-		})
-	}
-
-	_allNodes(nodes : Object) : Array<Object> {
+	_allNodes(nodes : Object = this.shadow.childNodes) : Array<Object> {
 		const result : Array<Object> = []
+
 		for(let node of nodes) {
 			const childNodes : Object = node.childNodes
-
 			result.push(node)
-
-			if(childNodes[0]) {
-				result.push(...this._allNodes(childNodes))
-			}
+			if(!childNodes[0]) continue
+			result.push(...this._allNodes(childNodes))
 		}
 		return result
 	}
@@ -68,7 +87,7 @@ class WebComponent extends HTMLElement {
 		return this._template
 	}
 
-	set template (selector : String = 'template') {
+	set template (selector : string = 'template') {
 		this._template = this._document().querySelector(selector).content.cloneNode(true)
 	}
 
