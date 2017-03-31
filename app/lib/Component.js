@@ -5,11 +5,10 @@ class WebComponent extends HTMLElement {
 
 	_template : HTMLTemplateElement
 
-	shadow : ShadowRoot
-
 	constructor() {
 		super()
-		this._attachShadow()
+		this.attachShadow({mode: 'open'})
+		console.warn('Proprty "shadow" are deprecated, use native "shadowRoot" property. #usetheplatform')
 	}
 
 	get template () : HTMLTemplateElement {
@@ -21,11 +20,13 @@ class WebComponent extends HTMLElement {
 		this._template = this._document().querySelector(selector).content.cloneNode(true)
 	}
 
-	_attachShadow() {
-		if(!this.shadow) {
-			this.shadow = this.attachShadow({mode: 'open'})
+	attachShadow(config : Object) : ShadowRoot {
+		let shadow : ShadowRoot
+		if(!this.shadowRoot) {
+			shadow = super.attachShadow(config)
 		}
-		this.shadow.appendChild(this.template)
+		shadow.appendChild(this.template)
+		return shadow
 	}
 
 	attributeChangedCallback(attr : string, oldValue : string, newValue : string) {
