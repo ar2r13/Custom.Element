@@ -9,40 +9,58 @@ class WebComponent extends HTMLElement {
 	constructor() {
 		super()
 		this._attachShadow()
-		this._domDataBind()
+		this._analyzeDom()
 	}
 
-	_domDataBind() {
-		const html : string = this.shadow.innerHTML
+	_analyzeDom() {
+		const nodes : Array<Object> = this._allNodes(this.shadow.childNodes)
 		const regexp : RegExp = /\[\[\s*([^\W+\d+\W+]\w+)\s*]]/gim
 
-		const nodeData : Array<[]> = []
+		for(let node of nodes) {
+			if(!node.data || node.nodeType !== 3) continue
 
-		let binding : Array<mixed>
+			const stamps : Array<[]> = []
+			let stamp : Array<mixed>
 
-		while ((binding = regexp.exec(html))) {
-			nodeData.push(binding)
+			while ((stamp = regexp.exec(node.data))) {
+				stamps.push(stamp)
+			}
+
+			if(stamps.length) {
+				stamps.forEach(_stamp => this._bindStamp(_stamp, _stamp.input))
+			}
 		}
+	}
 
-		for(let _bind of nodeData) {
-			const name : string = _bind[1]
+	_bindStamp([stamp, prop] : Array<string> = stamp, input : String, node : Object) {
+		const _prop : String = '_' + prop
 
-			Object.defineProperty(this, `_${name}`, {
-				enumerable: false,
-				writable: true
-			})
+		Object.defineProperty(this, _prop, { writable: true })
+		Object.defineProperty(this, prop, {
+			enumerable: true,
+			get: function () : String {
+				return this[_prop]
+			},
+			set: function(value : String) {
+				if(this[_prop] === value) return
+				this[_prop] = value
+				// node.data = input.replace(regexp, ())
+			}
+		})
+	}
 
-			Object.defineProperty(this, name, {
-				set: function (value : string = '') {
-					if(this[`_${name}`] === value) return
-					this[`_${name}`] = value
-					this.shadow.innerHTML = html.replace(_bind[0], value)
-				},
-				get: function () : string {
-					return this[`_${name}`]
-				}
-			})
+	_allNodes(nodes : Object) : Array<Object> {
+		const result : Array<Object> = []
+		for(let node of nodes) {
+			const childNodes : Object = node.childNodes
+
+			result.push(node)
+
+			if(childNodes[0]) {
+				result.push(...this._allNodes(childNodes))
+			}
 		}
+		return result
 	}
 
 	get template () : HTMLTemplateElement {
@@ -50,7 +68,7 @@ class WebComponent extends HTMLElement {
 		return this._template
 	}
 
-	set template (selector : string = 'template') {
+	set template (selector : String = 'template') {
 		this._template = this._document().querySelector(selector).content.cloneNode(true)
 	}
 
