@@ -17,13 +17,13 @@ class HelloApp extends window.WebComponent {
 		this._input.addEventListener('input', ::this._update)
 	}
 
-	__bench(name, count) {
-		console.time(name)
+	__bench(count) {
+		const t0 = performance.now()
 		for(let i = 0; i < count; i++) {
 			this.userName = i
-			this.people24 = i
 		}
-		console.timeEnd(name)
+		const t1 = performance.now()
+		console.log(t1 - t0)
 	}
 
 	_update() {
