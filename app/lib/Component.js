@@ -3,14 +3,33 @@
 
 class WebComponent extends HTMLElement {
 
-	_template : HTMLTemplateElement
 	_stampNodes : Object = {}
-	shadow : ShadowRoot
+
+	static get template () : HTMLTemplateElement {
+		return window.WebComponent.ownerDocument
+			.querySelector('template').content.cloneNode(true)
+	}
+
+	static get ownerDocument() : HTMLDocument {
+		return document.currentScript
+			? document.currentScript.ownerDocument
+			: document._currentScript.ownerDocument
+	}
 
 	constructor() {
 		super()
-		this._attachShadow()
+		this.attachShadow({mode: 'open'})
+		console.warn('Proprty "shadow" are deprecated, use native "shadowRoot" property. #usetheplatform')
 		this._detectStamps()
+	}
+
+	attachShadow(config : Object) : ShadowRoot {
+		let shadow : ShadowRoot
+		if(!this.shadowRoot) {
+			shadow = super.attachShadow(config)
+		}
+		shadow.appendChild(this.constructor.template)
+		return shadow
 	}
 
 	_detectStamps() {
@@ -70,7 +89,7 @@ class WebComponent extends HTMLElement {
 		}
 	}
 
-	_allNodes(nodes : Object = this.shadow.childNodes) : Array<Object> {
+	_allNodes(nodes : Object = this.shadowRoot.childNodes) : Array<Object> {
 		const result : Array<Object> = []
 
 		for(let node of nodes) {
@@ -80,28 +99,6 @@ class WebComponent extends HTMLElement {
 			result.push(...this._allNodes(childNodes))
 		}
 		return result
-	}
-
-	get template () : HTMLTemplateElement {
-		if(!this._template) this.template = void 0
-		return this._template
-	}
-
-	set template (selector : string = 'template') {
-		this._template = this._document().querySelector(selector).content.cloneNode(true)
-	}
-
-	_attachShadow() {
-		if(!this.shadow) {
-			this.shadow = this.attachShadow({mode: 'open'})
-		}
-		this.shadow.appendChild(this.template)
-	}
-
-	_document() : HTMLDocument {
-		return document.currentScript
-			? document.currentScript.ownerDocument
-			: document._currentScript.ownerDocument
 	}
 
 }
