@@ -22,6 +22,7 @@ export function es5 () {
 		.pipe(babel({
 			sourceMaps: 'inline'
 		}))
+		.on('error', ::console.error)
 		.pipe(gulp.dest(paths.dest))
 }
 

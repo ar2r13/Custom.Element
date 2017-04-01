@@ -3,6 +3,8 @@
 class HelloApp extends window.WebComponent {
 
 	static is = 'hello-app'
+	userName = 'Bruce Wayne'
+	hero = 'Batman'
 
 	constructor() {
 		super()
@@ -11,14 +13,21 @@ class HelloApp extends window.WebComponent {
 	connectedCallback() {
 		this._input = this.shadowRoot.querySelector('input')
 		this._string = this.shadowRoot.querySelector('span')
+		this._input.value = this.userName
 		this._input.addEventListener('input', ::this._update)
 	}
 
+	__bench(count) {
+		const t0 = performance.now()
+		for(let i = 0; i < count; i++) {
+			this.userName = i
+		}
+		const t1 = performance.now()
+		console.log(t1 - t0)
+	}
+
 	_update() {
-		let value = this._input.value
-		this._string.innerHTML = value
-			? 'Hello my name is: ' + value
-			: ''
+		this.userName = this._input.value
 	}
 
 	disconnectedCallback() {

@@ -36,6 +36,10 @@ module.exports = {
 			2,
 			{ "args": "none" }
 		],
+		"no-cond-assign": [
+			2,
+			"except-parens"
+		],
 		"flowtype/boolean-style": [
 			"error",
 			"boolean"
