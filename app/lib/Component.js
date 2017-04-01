@@ -3,7 +3,16 @@
 
 class WebComponent extends HTMLElement {
 
-	_template : HTMLTemplateElement
+	static get template () : HTMLTemplateElement {
+		return window.WebComponent.ownerDocument
+			.querySelector('template').content.cloneNode(true)
+	}
+
+	static get ownerDocument() : HTMLDocument {
+		return document.currentScript
+			? document.currentScript.ownerDocument
+			: document._currentScript.ownerDocument
+	}
 
 	constructor() {
 		super()
@@ -11,32 +20,13 @@ class WebComponent extends HTMLElement {
 		console.warn('Proprty "shadow" are deprecated, use native "shadowRoot" property. #usetheplatform')
 	}
 
-	get template () : HTMLTemplateElement {
-		if(!this._template) this.template = void 0
-		return this._template
-	}
-
-	set template (selector : string = 'template') {
-		this._template = this._document().querySelector(selector).content.cloneNode(true)
-	}
-
 	attachShadow(config : Object) : ShadowRoot {
 		let shadow : ShadowRoot
 		if(!this.shadowRoot) {
 			shadow = super.attachShadow(config)
 		}
-		shadow.appendChild(this.template)
+		shadow.appendChild(this.constructor.template)
 		return shadow
-	}
-
-	attributeChangedCallback(attr : string, oldValue : string, newValue : string) {
-
-	}
-
-	_document() : HTMLDocument {
-		return document.currentScript
-			? document.currentScript.ownerDocument
-			: document._currentScript.ownerDocument
 	}
 
 }

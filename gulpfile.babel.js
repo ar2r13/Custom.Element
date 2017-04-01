@@ -19,7 +19,6 @@ export function es5 () {
 	return gulp.src(paths.scripts)
 		.pipe(eslint())
 		.pipe(eslint.format())
-		.pipe(eslint.failAfterError())
 		.pipe(babel({
 			sourceMaps: 'inline'
 		}))
