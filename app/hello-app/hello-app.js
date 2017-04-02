@@ -3,35 +3,45 @@
 class HelloApp extends window.WebComponent {
 
 	static is = 'hello-app'
-	userName = 'Bruce Wayne'
-	hero = 'Batman'
 
 	constructor() {
 		super()
 	}
 
+	set userName(value) {
+		switch (value) {
+			case 'Bruce Wayne':
+				this.hero = 'the richest man in Gotham'
+				break
+			case 'Barry Allen':
+				this.hero = 'the fastest man on Earth'
+				break
+			case 'Batman' :
+				this.hero = 'The Dark Knight of Gotham'
+				break
+			default:
+				this.hero = 'don\' know, who am i'
+		}
+		super.userName = value
+	}
+
+	get userName () {
+		return super.userName
+	}
+
 	connectedCallback() {
 		this._input = this.shadowRoot.querySelector('input')
 		this._string = this.shadowRoot.querySelector('span')
-		this._input.value = this.userName
-		this._input.addEventListener('input', ::this._update)
+		this._input.value = this.userName ? this.userName : ''
+		this._input.addEventListener('input', ::this.update)
 	}
 
-	__bench(count) {
-		const t0 = performance.now()
-		for(let i = 0; i < count; i++) {
-			this.userName = i
-		}
-		const t1 = performance.now()
-		console.log(t1 - t0)
-	}
-
-	_update() {
+	update() {
 		this.userName = this._input.value
 	}
 
 	disconnectedCallback() {
-
+		//LOL
 	}
 
 	attributeChangedCallback(attr, oldValue, newValue) {
@@ -39,5 +49,17 @@ class HelloApp extends window.WebComponent {
 	}
 
 }
+
+// function observable (target, key, descriptor) {
+// 	const _key = '_' + key
+// 	descriptor.get = function() {
+// 		return this[_key]
+// 	}
+// 	descriptor.set = function(value) {
+// 		target[_key] = value
+// 		target.dispatcher.fire(key, value)
+// 	}
+// 	return descriptor
+// }
 
 window.customElements.define(HelloApp.is, HelloApp)
