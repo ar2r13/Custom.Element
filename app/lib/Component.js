@@ -7,6 +7,22 @@ class WebComponent extends HTMLElement {
 
 	dispatcher : Dispatcher = new Dispatcher()
 	stamps : Object = {}
+	proxyHandler : Object = {
+		set: (object : WebComponent, key : string, value : any) : any => {
+			console.info('set ' + value + ' in ' + key)
+			const _privates : Object = privates.get(this)
+			if(_privates[key] === value) return
+			_privates[key] = value
+			this.dispatcher.fire(key, value)
+			object[key] = value
+			return value
+		},
+		get: (object : WebComponent, key : string) : any => {
+			console.info('get ' + key)
+			object[key]
+			return privates.get(this)[key]
+		}
+	}
 
 	static get template () : HTMLTemplateElement {
 		return window.WebComponent.ownerDocument
@@ -19,11 +35,12 @@ class WebComponent extends HTMLElement {
 			: document._currentScript.ownerDocument
 	}
 
-	constructor() {
+	constructor() : Proxy {
 		super()
 		privates.set(this, {})
 		this.attachShadow({mode: 'open'})
 		this::detectStamps()
+		return new Proxy(this, this.proxyHandler : Object)
 	}
 
 	attachShadow(config : Object) : ShadowRoot {
@@ -77,7 +94,7 @@ function detectStamps () {
 					? stamps.push(newNode)
 					: this.stamps[prop] = [newNode]
 				this.dispatcher.on(prop, value => this::setStamp(prop, value))
-				this::defineObserver(prop)
+				// this::defineObserver(prop)
 			}
 
 			parentNode.insertBefore(newNode, nextNode)

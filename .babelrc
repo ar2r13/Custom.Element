@@ -9,7 +9,6 @@
 		"stage-0"
 	],
 	"plugins": [
-    	"transform-custom-element-classes",
 		"transform-decorators-legacy"
   	]
 }

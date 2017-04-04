@@ -22,11 +22,6 @@ class HelloApp extends window.WebComponent {
 			default:
 				this.hero = 'don\' know, who am i'
 		}
-		super.userName = value
-	}
-
-	get userName () {
-		return super.userName
 	}
 
 	connectedCallback() {
