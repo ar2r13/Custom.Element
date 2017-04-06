@@ -1,34 +1,21 @@
 {
 	"name": "lab",
 	"version": "0.1.0",
-	"main": "index.js",
 	"license": "MIT",
 	"devDependencies": {
 		"babel-eslint": "^7.2.1",
-		"babel-plugin-transform-decorators-legacy": "^1.3.4",
+		"babel-loader": "^6.4.1",
 		"babel-preset-env": "^1.3.2",
 		"babel-preset-flow": "^6.23.0",
-		"babel-preset-stage-0": "latest",
+		"babel-preset-stage-0": "^6.22.0",
 		"babili": "^0.0.12",
-		"cssnano": "^3.10.0",
+		"eslint": "^3.19.0",
 		"eslint-plugin-flowtype": "^2.30.4",
-		"gulp": "gulpjs/gulp#4.0",
-		"gulp-babel": "^6.1.2",
-		"gulp-develop-server": "^0.5.2",
-		"gulp-eslint": "^3.0.1",
-		"gulp-htmlmin": "^3.0.0",
-		"gulp-postcss": "^6.4.0",
-		"postcss-cssnext": "^2.10.0",
-		"stylelint": "^7.9.0",
-		"stylelint-config-standard": "^16.0.0"
-	},
-	"dependencies": {
-		"babel-register": "^6.24.0",
-		"express": "^4.15.2",
-		"spdy": "^3.4.4",
-		"wc-polyfil": "webcomponents/webcomponentsjs.git"
+		"webpack": "^2.3.3"
 	},
 	"scripts": {
-		"start": "./node_modules/gulp/bin/gulp.js"
+		"test": "eslint src",
+		"start": "webpack",
+		"build": "npm run test && webpack -p"
 	}
 }

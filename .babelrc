@@ -3,12 +3,11 @@
 		["env", {
 			"targets": {
   				"browsers": "> 5%"
-			}
+			},
+			"modules": false
 		}],
 		"flow",
-		"stage-0"
-	],
-	"plugins": [
-		"transform-decorators-legacy"
-  	]
+		"stage-0",
+		"babili"
+	]
 }
