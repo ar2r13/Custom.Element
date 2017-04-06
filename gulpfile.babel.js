@@ -19,9 +19,7 @@ export function es5 () {
 	return gulp.src(paths.scripts)
 		.pipe(eslint())
 		.pipe(eslint.format())
-		.pipe(babel({
-			sourceMaps: 'inline'
-		}))
+		.pipe(babel())
 		.on('error', ::console.error)
 		.pipe(gulp.dest(paths.dest))
 }

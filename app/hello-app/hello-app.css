@@ -12,7 +12,7 @@ body {
 	display: flex;
 }
 
-input {
+input[type="text"] {
 	font-size: 20px;
 	border: none;
 	box-shadow: 0 0 0 2px var(--main-color);

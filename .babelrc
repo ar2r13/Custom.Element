@@ -1,12 +1,14 @@
 {
 	"presets": [
-		"latest",
+		["env", {
+			"targets": {
+  				"browsers": "> 5%"
+			}
+		}],
 		"flow",
-		"stage-0",
-		"babili"
+		"stage-0"
 	],
 	"plugins": [
-    	"transform-custom-element-classes",
 		"transform-decorators-legacy"
   	]
 }
