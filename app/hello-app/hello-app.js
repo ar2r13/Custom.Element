@@ -1,11 +1,17 @@
 'use strict'
 
-class HelloApp extends Custom(HTMLElement) {
+class HelloApp extends Custom(HTMLElement) { //eslint-disable-line
 
 	static is = 'hello-app'
+	static observedProperties = ['userName', 'hero']
 
 	constructor() {
 		super()
+		this.userName = 'Batman'
+	}
+
+	get userName () {
+		return super.userName
 	}
 
 	set userName(value) {
@@ -20,12 +26,13 @@ class HelloApp extends Custom(HTMLElement) {
 				this.hero = 'The Dark Knight of Gotham'
 				break
 			default:
-				this.hero = 'don\' know, who am i'
+				this.hero = 'the ' + value
 		}
 		super.userName = value
 	}
 
 	connectedCallback() {
+		super.connectedCallback()
 		this._input = this.shadowRoot.querySelector('input')
 		this._string = this.shadowRoot.querySelector('span')
 		this._input.value = this.userName ? this.userName : ''
@@ -36,26 +43,6 @@ class HelloApp extends Custom(HTMLElement) {
 		this.userName = this._input.value
 	}
 
-	disconnectedCallback() {
-		//LOL
-	}
-
-	attributeChangedCallback(attr, oldValue, newValue) {
-
-	}
-
 }
-
-// function observable (target, key, descriptor) {
-// 	const _key = '_' + key
-// 	descriptor.get = function() {
-// 		return this[_key]
-// 	}
-// 	descriptor.set = function(value) {
-// 		target[_key] = value
-// 		target.dispatcher.fire(key, value)
-// 	}
-// 	return descriptor
-// }
 
 window.customElements.define(HelloApp.is, HelloApp)

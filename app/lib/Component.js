@@ -1,21 +1,16 @@
 // @flow
 'use strict'
 
-const privates : WeakMap<WebComponent, Object> = new WeakMap()
-
-function Custom(SuperClass : Object = Object) : WebComponent {
+function Custom(SuperClass : Object = Object) : WebComponent { //eslint-disable-line
 	return class extends WebComponent {}
 }
+
+const privates : WeakMap<WebComponent, Object> = new WeakMap()
 
 class WebComponent extends HTMLElement {
 
 	dispatcher : Dispatcher = new Dispatcher()
 	stamps : Object = {}
-
-	static get template () : HTMLTemplateElement {
-		return window.WebComponent.ownerDocument
-			.querySelector('template').content.cloneNode(true)
-	}
 
 	static get ownerDocument() : typeof document {
 		return document.currentScript
@@ -26,8 +21,16 @@ class WebComponent extends HTMLElement {
 	constructor() {
 		super()
 		privates.set(this, {})
+		if(this.constructor !== WebComponent) {
+			this::defineStaticProperty('template', template)
+		}
 		this.attachShadow({mode: 'open'})
 		this::detectStamps()
+		this.constructor.observedProperties.forEach(prop => this::defineObserver(prop))
+	}
+
+	connectedCallback() {
+		Object.keys(this.stamps).forEach(prop => this::setStamp(prop))
 	}
 
 	attachShadow(config : Object) : ShadowRoot {
@@ -52,6 +55,17 @@ class WebComponent extends HTMLElement {
 
 }
 
+function template () : HTMLTemplateElement {
+	return window.WebComponent.ownerDocument
+		.querySelector('template').content.cloneNode(true)
+}
+
+function defineStaticProperty (propName : string, func : Function) {
+	Object.defineProperty(this.constructor, propName, {
+		get: func
+	})
+}
+
 function detectStamps () {
 	const nodes : Array<Object> = this.allNodes()
 	const stampSelector : RegExp = /(\[\[\s*[^\W+\d+\W+]\w*\s*]])/gim
@@ -71,7 +85,7 @@ function detectStamps () {
 
 		chunks.forEach((chunck : string) => {
 			const test : any = chunck.match(stampTest)
-			const prop : string = test ? test[1] : test
+			const prop : string = test ? test[1] : void 0
 			const data : string = prop ? '' : chunck
 			const newNode : Text = document.createTextNode(data)
 
@@ -80,8 +94,9 @@ function detectStamps () {
 				stamps instanceof Array
 					? stamps.push(newNode)
 					: this.stamps[prop] = [newNode]
-				this.dispatcher.on(prop, value => this::setStamp(prop, value))
-				this::defineObserver(prop)
+				if(this.constructor.observedProperties.includes(prop)) {
+					this.dispatcher.on(prop, value => this::setStamp(prop, value))
+				}
 			}
 
 			parentNode.insertBefore(newNode, nextNode)
@@ -89,7 +104,7 @@ function detectStamps () {
 	}
 }
 
-function setStamp(prop : string, value : any) {
+function setStamp(prop : string, value? : any = this[prop]) {
 	let shadow = this.shadowRoot
 	this.stamps[prop].forEach((node : Object, index : number) => {
 		if(!shadow) return
@@ -137,6 +152,3 @@ class Dispatcher {
 	}
 
 }
-
-//temporary solution
-window.WebComponent = WebComponent
