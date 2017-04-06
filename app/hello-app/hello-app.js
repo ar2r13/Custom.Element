@@ -1,6 +1,6 @@
 'use strict'
 
-class HelloApp extends window.WebComponent {
+class HelloApp extends Custom(HTMLElement) {
 
 	static is = 'hello-app'
 
@@ -22,6 +22,7 @@ class HelloApp extends window.WebComponent {
 			default:
 				this.hero = 'don\' know, who am i'
 		}
+		super.userName = value
 	}
 
 	connectedCallback() {
