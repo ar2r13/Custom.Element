@@ -1,12 +1,12 @@
 module.exports = {
     "parser": "babel-eslint",
     "plugins": [
-        "flowtype"
+        "flowtype",
+		"html"
     ],
     "env": {
         "browser": true,
-        "es6": true,
-		"node": true
+        "es6": true
     },
     "extends": [
         "eslint:recommended",
@@ -85,7 +85,8 @@ module.exports = {
     },
 	"settings": {
     	"flowtype": {
-			"onlyFilesWithFlowAnnotation": true
+			"onlyFilesWithFlowAnnotation": true,
+			"html/html-extensions": [".html"]
 		}
 	}
 };

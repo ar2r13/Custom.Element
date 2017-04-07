@@ -1,13 +1,13 @@
+<link rel="import" href="dispatcher.html">
+<script type="text/javascript">
 // @flow
 'use strict'
 
-import Dispatcher from './dispatcher'
-
 const privates : WeakMap<WebComponent, Object> = new WeakMap()
 
-export default class WebComponent extends HTMLElement {
+class WebComponent extends HTMLElement {
 
-	dispatcher : Dispatcher = new Dispatcher()
+	dispatcher : Dispatcher = new Dispatcher() //eslint-disable-line
 	stamps : Object = {}
 
 	static get ownerDocument() : typeof document {
@@ -127,3 +127,5 @@ function defineObserver(prop : string) {
 		}
 	})
 }
+
+</script>
