@@ -11,6 +11,7 @@
 		"babili": "^0.0.12",
 		"eslint": "^3.19.0",
 		"eslint-plugin-flowtype": "^2.30.4",
+		"flow": "^0.2.3",
 		"webpack": "^2.3.3"
 	},
 	"scripts": {
