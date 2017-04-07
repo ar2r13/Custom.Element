@@ -1,6 +1,5 @@
-npm-debug.log
 node_modules
-keys
-public
+npm-debug.log
 yarn.lock
 .DS_Store
+dist
