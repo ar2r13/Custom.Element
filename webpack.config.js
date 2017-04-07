@@ -3,10 +3,10 @@ const path = require('path')
 module.exports = {
 	context: path.resolve(__dirname, './src'),
 	entry: {
-		component: './Component.js'
+		component: './index.js'
 	},
 	output: {
-		filename: '[name].js',
+		filename: 'component.js',
 		path: path.resolve(__dirname, 'dist')
 	},
 	module: {

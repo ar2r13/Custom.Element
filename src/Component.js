@@ -1,13 +1,11 @@
 // @flow
 'use strict'
 
-function Custom(SuperClass : Object = Object) : WebComponent { //eslint-disable-line
-	return class extends WebComponent {}
-}
+import Dispatcher from './dispatcher'
 
 const privates : WeakMap<WebComponent, Object> = new WeakMap()
 
-class WebComponent extends HTMLElement {
+export default class WebComponent extends HTMLElement {
 
 	dispatcher : Dispatcher = new Dispatcher()
 	stamps : Object = {}
@@ -56,7 +54,7 @@ class WebComponent extends HTMLElement {
 }
 
 function template () : HTMLTemplateElement {
-	return window.WebComponent.ownerDocument
+	return WebComponent.ownerDocument
 		.querySelector('template').content.cloneNode(true)
 }
 
@@ -128,27 +126,4 @@ function defineObserver(prop : string) {
 			this.dispatcher.fire(prop, value)
 		}
 	})
-}
-
-class Dispatcher {
-	stack : Object
-
-	constructor () {
-		this.stack = {}
-	}
-
-	on(prop : string, handler : Function) {
-		let stack = this.stack[prop]
-		stack instanceof Array
-			? stack.push
-			: stack = [handler]
-		this.stack[prop] = stack
-	}
-
-	fire(prop : string, data : any) {
-		const stack : Array<Function> = this.stack[prop]
-		if(!stack || !stack.length) return
-		stack.forEach(handler => handler(data))
-	}
-
 }
