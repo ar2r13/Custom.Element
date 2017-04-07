@@ -15,8 +15,8 @@
 		"webpack": "^2.3.3"
 	},
 	"scripts": {
-		"test": "eslint src",
-		"start": "webpack",
-		"build": "npm run test && webpack -p"
+		"postinstall": "npm start",
+		"start": "npm run test && webpack",
+		"test": "eslint src"
 	}
 }
