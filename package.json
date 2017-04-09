@@ -12,12 +12,12 @@
 		"eslint": "^3.19.0",
 		"eslint-plugin-flowtype": "^2.30.4",
 		"eslint-plugin-html": "^2.0.1",
-		"flow": "^0.2.3"
+		"flow-bin": "^0.43.1"
 	},
 	"scripts": {
 		"postinstall": "npm start",
-		"start": "npm run test && npm run build",
-		"test": "eslint --ext .html src",
-		"build": "babel-html -s src -d dist -m"
+		"start": "babel-html -s src -d dist -w",
+		"test": "flow && eslint --ext .html,.js src",
+		"build": "npm test && babel-html -s src -d dist -m"
 	}
 }

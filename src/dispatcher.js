@@ -1,13 +1,9 @@
-<script type="text/javascript">
 // @flow
 'use strict'
 
-class Dispatcher { //eslint-disable-line
-	stack : Object
+const Dispatcher = class { //eslint-disable-line
 
-	constructor () {
-		this.stack = {}
-	}
+	stack : Object = {}
 
 	on(prop : string, handler : Function) {
 		let stack = this.stack[prop]
@@ -24,4 +20,3 @@ class Dispatcher { //eslint-disable-line
 	}
 
 }
-</script>

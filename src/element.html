@@ -1,9 +1,9 @@
-<link rel="import" href="component.html">
+<script src="dispatcher.js" defer charset="utf-8"></script>
+<script src="component.js" defer charset="utf-8"></script>
 <script type="text/javascript">
-// @flow
-'use strict'
-/* eslint-disable */
-function Custom(SuperClass : Object = Object) : WebComponent {
-	return class extends WebComponent {}
-}
+	'use strict'
+	/* eslint-disable */
+	const Custom = SuperClass => {
+		return class extends WebComponent {}
+	}
 </script>

@@ -85,8 +85,7 @@ module.exports = {
     },
 	"settings": {
     	"flowtype": {
-			"onlyFilesWithFlowAnnotation": true,
-			"html/html-extensions": [".html"]
+			"onlyFilesWithFlowAnnotation": true
 		}
 	}
 };
