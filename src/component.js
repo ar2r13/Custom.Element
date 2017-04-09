@@ -57,28 +57,6 @@ class WebComponent extends HTMLElement {
 
 }
 
-//Temporary Deprecated
-function template (selector : string = 'template') : DocumentFragment { //eslint-disable-line
-	const ownerDocument : Document = WebComponent.ownerDocument
-	const node : ?HTMLElement = ownerDocument.querySelector(selector)
-	if(!node) {
-		// flow-ignore HTMLLinkElement
-		const links : NodeList<HTMLLinkElement> = ownerDocument.querySelectorAll('link[rel="import"]')
-		if(links) {
-			for(let link of links) {
-				// flow-ignore HTMLLinkElement import
-				const _node : HTMLTemplateElement = link.import.querySelector(selector)
-				if(_node) return _node.content.cloneNode(true)
-			}
-		}
-		throw new Error(`Template "${selector}" not found.`)
-	}
-	return node instanceof HTMLTemplateElement
-		? node.content.cloneNode(true)
-		// flow-ignore DocumentFragment
-		: node.cloneNode(true)
-}
-
 function detectStamps () {
 	const nodes : Array<Object> = this.allNodes()
 	const stampSelector : RegExp = /(\[\[\s*[^\W+\d+\W+]\w*\s*]])/gim
@@ -124,8 +102,11 @@ function setStamp(prop : string, value? : any = this[prop]) {
 	let shadow = this.shadowRoot
 	this.stamps[prop].forEach((node : Object, index : number) => {
 		if(!shadow) return
+		const stampValue : string = value === undefined || null
+			? ''
+			: value + ''
 		shadow.contains(node)
-			? node.data = value || ''
+			? node.data = stampValue
 			: this.stamps[prop].splice(index, 1)
 	})
 }

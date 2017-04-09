@@ -4,6 +4,11 @@
 	'use strict'
 	/* eslint-disable */
 	const Custom = SuperClass => {
-		return class extends WebComponent {}
+		const _owner = WebComponent.ownerDocument
+		return class extends WebComponent {
+			static get template() {
+				return _owner.querySelector('template').content.cloneNode(true)
+			}
+		}
 	}
 </script>
