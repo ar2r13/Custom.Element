@@ -6,6 +6,7 @@ const privates : WeakMap<WebComponent, Object> = new WeakMap()
 class WebComponent extends HTMLElement {
 	// flow-ignore Dispatcher imports as html-import
 	dispatcher : Dispatcher = new Dispatcher() //eslint-disable-line
+	bindings : Array<Function> = []
 	stamps : Object = {}
 
 	static get ownerDocument() : typeof document {
@@ -23,12 +24,14 @@ class WebComponent extends HTMLElement {
 		// flow-ignore flow is not support ::bind syntax
 		this.attachShadow({mode: 'open'})
 		/*::`*/this::detectStamps()/*::`*/
+		/*::`*/this::detectBindings()/*::`*/
 		if(observedProperties instanceof Array) {
 			observedProperties.forEach(prop => /*::`*/this::defineObserver(prop)/*::`*/)
 		}
 	}
 
 	connectedCallback() {
+		this.bindings.forEach(fn => fn())
 		Object.keys(this.stamps).forEach(prop => /*::`*/this::setStamp(prop)/*::`*/)
 	}
 
@@ -40,7 +43,7 @@ class WebComponent extends HTMLElement {
 		return shadow
 	}
 
-	allNodes(root : ?Node = this.shadowRoot) : Array<Object> {
+	allNodes(root : ?Node = this.shadowRoot) : Array<Node> {
 		if(!root) return []
 
 		const nodes : NodeList<Node> = root.childNodes
@@ -57,8 +60,49 @@ class WebComponent extends HTMLElement {
 
 }
 
+function _getNodes(root : ShadowRoot) : Array<Element> {
+	const elements : Array<Element> = []
+	const nodeIterator : NodeIterator<ShadowRoot, Element> = window.document.createNodeIterator(root, NodeFilter.SHOW_ELEMENT,
+		(elem : Element) => elem.attributes.length ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT)
+
+	let elem
+	while((elem = nodeIterator.nextNode())) {
+		elements.push(elem)
+	}
+
+	return elements
+}
+
+function detectBindings () {
+	const elements : Array<Element> = _getNodes(this.shadowRoot)
+
+	elements.forEach((elem : Element) => {
+		for(let attr of elem.attributes) {
+			if(attr.value.indexOf('::') === 0) {
+				const prop : string = attr.name
+				const value : string  = 'this.' + attr.value.substring(2)
+				const expRoot : RegExp = /^::(\w*)\W?/
+				const exp : Function = new Function('elem', 'prop', `
+					elem[prop] = ${value}
+				`).bind(this)
+				const binding : exp = () => exp(elem, prop)
+
+				const matchRoot : ?Array<string> = attr.value.match(expRoot)
+				const rootProp : ?string = matchRoot ? matchRoot[1] : matchRoot
+
+				const observedProperties : Array<string> = this.constructor.observedProperties
+				if(rootProp && observedProperties instanceof Array && observedProperties.includes(rootProp)) {
+					this.dispatcher.on(rootProp, binding)
+				} else {
+					this.bindings.push(binding)
+				}
+			}
+		}
+	})
+}
+
 function detectStamps () {
-	const nodes : Array<Object> = this.allNodes()
+	const nodes : Array<Text> = this.allNodes()
 	const stampSelector : RegExp = /(\[\[\s*[^\W+\d+\W+]\w*\s*]])/gim
 	const stampTest : RegExp = /\[\[\s*([^\W+\d+\W+]\w*)\s*]]/i
 
@@ -70,8 +114,10 @@ function detectStamps () {
 
 		if(!chunks.length) continue
 
-		const parentNode : Object = node.parentNode
-		const nextNode : Object = node.nextSibling
+		const parentNode : ?Node = node.parentNode || document.body
+		const nextNode : ?Node = node.nextSibling
+
+		if(!parentNode) continue
 
 		node.remove()
 
