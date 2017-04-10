@@ -80,14 +80,14 @@ function detectBindings () {
 		for(let attr of elem.attributes) {
 			if(attr.value.indexOf('::') === 0) {
 				const prop : string = attr.name
-				const value : string  = 'this.' + attr.value.substring(2)
-				const expRoot : RegExp = /^::(\w*)\W?/
+				const bindOperator : string = '::(\w*)'
+				const value : string  = attr.value.replace(new RegExp(bindOperator, 'g'), 'this.$1')
 				const exp : Function = new Function('elem', 'prop', `
-					elem[prop] = ${value}
+						elem[prop] = ${value}
 				`).bind(this)
 				const binding : exp = () => exp(elem, prop)
 
-				const matchRoot : ?Array<string> = attr.value.match(expRoot)
+				const matchRoot : ?Array<string> = attr.value.match(new RegExp(bindOperator))
 				const rootProp : ?string = matchRoot ? matchRoot[1] : matchRoot
 
 				const observedProperties : Array<string> = this.constructor.observedProperties
@@ -168,7 +168,7 @@ function defineObserver(prop : string) {
 		set: function(value : any) {
 			const _privates : ?Object = privates.get(this)
 
-			const message : string = 'WebComponent] Something went wrong. No storage found'
+			const message : string = '[WebComponent] Something went wrong. No storage found.'
 			if(!_privates) throw new ReferenceError(message)
 
 			if(_privates[prop] === value) return
