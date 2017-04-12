@@ -8,6 +8,7 @@ class WebComponent extends HTMLElement {
 	dispatcher : Dispatcher = new Dispatcher() //eslint-disable-line
 	bindings : Array<Function> = []
 	stamps : Object = {}
+	elems : Object = {}
 
 	static get ownerDocument() : typeof document {
 		return document.currentScript
@@ -60,7 +61,7 @@ class WebComponent extends HTMLElement {
 
 }
 
-function _getNodes(root : ShadowRoot) : Array<Element> {
+function allElements(root : ShadowRoot) : Array<Element> {
 	const elements : Array<Element> = []
 	const nodeIterator : NodeIterator<ShadowRoot, Element> = window.document.createNodeIterator(root, NodeFilter.SHOW_ELEMENT,
 		(elem : Element) => elem.attributes.length ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT)
@@ -74,9 +75,10 @@ function _getNodes(root : ShadowRoot) : Array<Element> {
 }
 
 function detectBindings () {
-	const elements : Array<Element> = _getNodes(this.shadowRoot)
+	const elements : Array<Element> = allElements(this.shadowRoot)
 
 	elements.forEach((elem : Element) => {
+		if(elem.id) this.elems[elem.id] = elem
 		for(let attr of elem.attributes) {
 			if(attr.value.indexOf('::') === 0) {
 				const prop : string = attr.name
