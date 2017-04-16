@@ -1,14 +1,56 @@
-<script src="dispatcher.js" defer charset="utf-8"></script>
-<script src="component.js" defer charset="utf-8"></script>
+<!-- <script src="dispatcher.js" defer charset="utf-8"></script> -->
 <script type="text/javascript">
 	'use strict'
-	/* eslint-disable */
-	const Custom = SuperClass => {
-		const _owner = WebComponent.ownerDocument
-		return class extends WebComponent {
-			static get template() {
-				return _owner.querySelector('template').content.cloneNode(true)
+
+	function Custom(superClass) {
+		const mixins = [
+			Custom.Templating
+		]
+		return class extends Custom.mix(superClass).with(...mixins) {}
+	}
+
+	Custom.mix = function (superClass) {
+		class Builder {
+			constructor(superClass) {
+				this.superClass = superClass
+			}
+			with(...mixins) {
+				return mixins.reduce((c, mixin) => mixin(c), this.superClass) || this.superClass
 			}
 		}
+		return new Builder(superClass)
 	}
+
+	Custom.Templating = function (SuperClass) {
+		const ownerDocument = document.currentScript
+				? document.currentScript.ownerDocument
+				: document._currentScript.ownerDocument
+
+		return class extends SuperClass {
+
+			static get template () : DocumentFragment {
+				const template : ?HTMLTemplateElement = ownerDocument.querySelector('template')
+				if(!template) throw new Error('Template not found')
+				return template.content.cloneNode(true)
+			}
+
+			constructor() {
+				super()
+				this.attachShadow({mode: 'open'})
+			}
+
+			attachShadow(config : Object) : ShadowRoot {
+				if(this.shadowRoot) return this.shadowRoot
+				const shadow : ShadowRoot = super.attachShadow(config)
+				shadow.appendChild(this.constructor.template)
+				return shadow
+			}
+
+		}
+	}
+
+	Object.defineProperty(Custom, 'Element', {
+		get() { return Custom(HTMLElement) }
+	})
+
 </script>

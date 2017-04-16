@@ -15,7 +15,6 @@
 		"flow-bin": "^0.43.1"
 	},
 	"scripts": {
-		"postinstall": "npm start",
 		"start": "babel-html -s src -d dist -w",
 		"test": "flow && eslint --ext .html,.js src",
 		"build": "npm test && babel-html -s src -d dist -m"
