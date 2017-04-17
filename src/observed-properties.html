@@ -1,0 +1,33 @@
+<script type="text/javascript">
+	function observedProperties (SuperClass) { // eslint-disable-line no-unused-vars
+		const privates = new WeakMap()
+
+		return class extends SuperClass {
+			constructor() {
+				super()
+				privates.set(this, {})
+				const observedProperties = this.constructor.observedProperties
+				if(observedProperties instanceof Array) {
+					observedProperties.forEach(prop => this::defineObserver(prop))
+				}
+			}
+		}
+
+		function defineObserver (prop) {
+			const target = this.constructor.prototype
+			const accessor = Object.getOwnPropertyDescriptor(target, prop)
+			Object.defineProperty(target, prop, {
+				get() {
+					return (typeof accessor.get === 'function')
+						? accessor.get() || privates.get(this)[prop]
+						: privates.get(this)[prop]
+				},
+				set(value){
+					return (typeof accessor.set === 'function')
+						? privates.get(this)[prop] = accessor.set(value) || value
+						: privates.get(this)[prop] = value
+				}
+			})
+		}
+	}
+</script>
