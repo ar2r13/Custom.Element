@@ -79,7 +79,8 @@ function detectBindings () {
 
 	elements.forEach((elem : Element) => {
 		if(elem.id) this.elems[elem.id] = elem
-		for(let attr of elem.attributes) {
+		for(let i = 0; i < elem.attributes.length; i++) {
+			const attr = elem.attributes[i]
 			if(attr.value.indexOf('::') === 0) {
 				const prop : string = attr.name
 				const bindOperator : string = '::(\w*)'
