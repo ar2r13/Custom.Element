@@ -1,11 +1,15 @@
 <!-- <script src="dispatcher.js" defer charset="utf-8"></script> -->
+<link rel="import" href="templating.html">
 <script type="text/javascript">
 	'use strict'
 
 	function Custom(superClass) {
+		/* eslint-disable no-undef */
 		const mixins = [
-			Custom.Templating
+			Templating
 		]
+		/* eslint-enable */
+
 		return class extends Custom.mix(superClass).with(...mixins) {}
 	}
 
@@ -19,34 +23,6 @@
 			}
 		}
 		return new Builder(superClass)
-	}
-
-	Custom.Templating = function (SuperClass) {
-		const ownerDocument = document.currentScript
-				? document.currentScript.ownerDocument
-				: document._currentScript.ownerDocument
-
-		return class extends SuperClass {
-
-			static get template () : DocumentFragment {
-				const template : ?HTMLTemplateElement = ownerDocument.querySelector('template')
-				if(!template) throw new Error('Template not found')
-				return template.content.cloneNode(true)
-			}
-
-			constructor() {
-				super()
-				this.attachShadow({mode: 'open'})
-			}
-
-			attachShadow(config : Object) : ShadowRoot {
-				if(this.shadowRoot) return this.shadowRoot
-				const shadow : ShadowRoot = super.attachShadow(config)
-				shadow.appendChild(this.constructor.template)
-				return shadow
-			}
-
-		}
 	}
 
 	Object.defineProperty(Custom, 'Element', {
