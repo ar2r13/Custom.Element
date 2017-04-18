@@ -1,16 +1,21 @@
-<!-- <script src="dispatcher.js" defer charset="utf-8"></script> -->
 <link rel="import" href="templating.html">
+<link rel="import" href="observed-properties.html">
 <script type="text/javascript">
 	'use strict'
 
 	function Custom(superClass) {
 		/* eslint-disable no-undef */
 		const mixins = [
-			Templating
+			Templating,
+			observedProperties
 		]
 		/* eslint-enable */
 
-		return class extends Custom.mix(superClass).with(...mixins) {}
+		return class extends Custom.mix(superClass).with(...mixins) {
+			static get element() {
+				return super.element || this
+			}
+		}
 	}
 
 	Custom.mix = function (superClass) {
