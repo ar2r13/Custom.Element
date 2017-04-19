@@ -19,7 +19,7 @@
 	}
 
 	Custom.mix = function (superClass) {
-		class Builder {
+		class Mixin {
 			constructor(superClass) {
 				this.superClass = superClass
 			}
@@ -27,7 +27,7 @@
 				return mixins.reduce((c, mixin) => mixin(c), this.superClass) || this.superClass
 			}
 		}
-		return new Builder(superClass)
+		return new Mixin(superClass)
 	}
 
 	Object.defineProperty(Custom, 'Element', {

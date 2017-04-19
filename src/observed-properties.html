@@ -5,36 +5,42 @@
 		const privates = new WeakMap()
 
 		return class extends SuperClass {
-			constructor() {
+			constructor () {
 				super()
 				const observedProperties = this.constructor.observedProperties
 				if(!(observedProperties instanceof Array)) {
+					console.log(1)
 					privates.set(this, {})
 				}
 			}
 
-			static get element() {
+			static get element () {
 				return observedPropertiesDecorator(super.element || this)
 			}
 		}
 
-		function observedPropertiesDecorator(target) { // eslint-disable-line no-unused-vars
+		function observedPropertiesDecorator (target) { // eslint-disable-line no-unused-vars
 			const observedProperties = target.observedProperties
 			if(!(observedProperties instanceof Array)) return target
 
 			observedProperties.forEach(prop => defineObserver(prop))
 
-			function defineObserver(prop) {
-				const accessor = Object.getOwnPropertyDescriptor(target, prop)
-				Object.defineProperty(target, prop, {
-					get() {
+			function defineObserver (prop) {
+				const accessor = Object.getOwnPropertyDescriptor(target.prototype, prop)
+				Object.defineProperty(target.prototype, prop, {
+					get () {
+						console.info('get ' + prop)
+						const privateValue = privates.get(this)[prop]
 						return (typeof accessor.get === 'function')
-							? accessor.get()
-							: void 0
+							? accessor.get() || privateValue
+							: privateValue
 					},
-					set(value){
-						return (typeof accessor.set === 'function')
-							? accessor.set(value)
+					set (value) {
+						console.info('set ' + value + ' in ' + prop)
+						const privateValue = privates.get(this)
+						console.log(3)
+						privateValue[prop] = (typeof accessor.set === 'function')
+							? accessor.set(value) || value
 							: value
 					}
 				})
