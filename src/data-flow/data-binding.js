@@ -6,8 +6,10 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	const bindings : WeakMap<Element, Array<Function>> = new WeakMap()
 	const stamps : WeakMap<Element, Object> = new WeakMap()
 
+	const regX : RegExp = /this[\.\[(]+(\w+)|::(\w+)/
+
 	const stampErrorMessage : string = '[WebComponent] Something went wrong. No stamps storage found.'
-	
+
 	// flow-ignore-line
 	return class extends SuperClass {
 		constructor() {
@@ -42,17 +44,21 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 			const _bindings : ?Array<Function> = bindings.get(this)
 			if (!_bindings) return
 			_bindings.forEach(fn => fn())
+
+			const _stamps : ?Object = stamps.get(this)
+			if(!_stamps) return
+			Object.keys(_stamps).forEach(prop => /*::`*/this::setStamp(prop)/*::`*/)
 		}
 	}
 
 	function detectStamp(node : Text) {
 		if(!node.data || node.nodeType !== 3) return
 
-		const stampSelector : RegExp = /(\[\[\s*[^\W+\d+\W+]\w*\s*]])/gim
-		const stampTest : RegExp = /\[\[\s*([^\W+\d+\W+]\w*)\s*]]/i
+		const stampSelector : RegExp = /(\[\[\s*\w+[\.\w]*\s*]])/gim
+		const stampTest : RegExp = /\[\[\s*(\w+[\.\w]*)\s*]]/i
 		const chunks : Array<string> = node.data.split(stampSelector)
 
-		if(!chunks.length) return
+		if(chunks.length <= 1) return
 
 		const parentNode : ?Node = node.parentNode || document.body
 		const nextNode : ?Node = node.nextSibling
@@ -63,45 +69,56 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 		chunks.forEach((chunck : string) => {
 			const test : any = chunck.match(stampTest)
-			const prop : string = test ? test[1] : ''
-			const data : string = prop ? '' : chunck
+			const ref : string = test ? test[1] : ''
+			const data : string = ref ? '' : chunck
 			const newNode : Text = document.createTextNode(data)
 
-			if(prop) {
-				const _stamps : ?Object = stamps.get(this)
+			parentNode.insertBefore(newNode, nextNode)
+			if(!ref) return
 
-				if(!_stamps) throw new ReferenceError(stampErrorMessage)
+			const _stamps : ?Object = stamps.get(this)
+			if(!_stamps) throw new ReferenceError(stampErrorMessage)
 
-				const stampList : Array<Text> = _stamps[prop]
+			const stampList : Array<Text> = _stamps[ref]
 
-				stampList instanceof Array
-					? stampList.push(newNode)
-					: _stamps[prop] = [newNode]
+			Array.isArray(stampList)
+				? stampList.push(newNode)
+				: _stamps[ref] = [newNode]
 
-				const observedProperties : Array<string> = this.constructor.observedProperties
-				if(observedProperties instanceof Array && observedProperties.includes(prop)) {
-					this.observables.subscribe(prop, value => /*::`*/this::setStamp(prop, value)/*::`*/)
+			const observedProperties : Array<string> = this.constructor.observedProperties
+			if(Array.isArray(observedProperties)) {
+				const rootProp : ?Array<string> = regX.exec(ref)
+				if(!rootProp) return
+
+				if(observedProperties.includes(rootProp[1])) {
+					this.observables.subscribe(rootProp[1],
+						value => /*::`*/this::setStamp(ref)/*::`*/)
 				}
 			}
-
-			parentNode.insertBefore(newNode, nextNode)
 		})
 	}
 
-	function setStamp(prop : string, value? : any = this[prop]) {
+	function setStamp(ref : string) {
+		let value
+		const testRegX : RegExp = /[\.\[\]()]/
+		if(testRegX.test(ref)) {
+			value = new Function(`return ${ref}`).call(this)
+		}
+
 		let shadow = this.shadowRoot
 		const stampList : ?Object = stamps.get(this)
 
 		if(!stampList) throw new ReferenceError(stampErrorMessage)
 
-		stampList[prop].forEach((node : Object, index : number) => {
+		stampList[ref].forEach((node : Object, index : number) => {
 			if(!shadow) return
-			const stampValue : string = value === undefined || null
+			const stampValue : string = value == null
 				? ''
+				// flow-ignore-line
 				: value + ''
 			shadow.contains(node)
 				? node.data = stampValue
-				: this.stamps[prop].splice(index, 1)
+				: this.stamps[ref].splice(index, 1)
 		})
 	}
 
@@ -109,29 +126,33 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 		const bindingList : ?Array<Function> = bindings.get(this)
 		const errorMessage : string = '[WebComponent] Something went wrong. No stamps storage found.'
 
-		if(!(bindingList instanceof Array)) throw new ReferenceError(errorMessage)
+		if(!Array.isArray(bindingList)) throw new ReferenceError(errorMessage)
 
 		for (let i = 0; i < elem.attributes.length; i++) {
 			const attr : Object = elem.attributes[i]
 
-			if (attr.value.indexOf('::') !== 0) continue
+			if (!regX.test(attr.value)) continue
 
 			const prop : string = attr.name
-			const bindOperatorRegX : string = '::(\w*)'
-			const value : string = attr.value.replace(new RegExp(bindOperatorRegX, 'g'), 'this.$1')
-			const exp : Function = new Function('elem', 'prop', `
-					elem[prop] = ${value}
+			const bindOperatorRegX : RegExp = /::(\\w*)/ig
+			const value : string = attr.value.replace(bindOperatorRegX, 'elem.$1')
+			const exp : Function = new Function('elem', `
+					let value = ${value}
+					elem.${prop} = typeof value === 'function'
+						? value.bind(this)
+						: value
 				`).bind(this)
-			const binding : exp = () => exp(elem, prop)
+			const binding : exp = () => exp(elem)
 			const observedProperties : Array <string> = this.constructor.observedProperties
 
-			if (observedProperties instanceof Array) {
-				const matchRoot : ?Array <string> = attr.value.match(new RegExp(bindOperatorRegX))
-				const rootProp : ?string = matchRoot ? matchRoot[1] : matchRoot
+			if (Array.isArray(observedProperties)) {
+				const propRegX : RegExp = /this[\.\[](\w+)/g
+				let result
 
-				if (rootProp && observedProperties.includes(rootProp)) {
-					this.observables.subscribe(rootProp, binding)
-					continue
+				while((result = propRegX.exec(value))) {
+					if(observedProperties.includes(result[1])) {
+						this.observables.subscribe(result[1], binding)
+					}
 				}
 			}
 

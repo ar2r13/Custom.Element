@@ -54,7 +54,7 @@ function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disab
 					}
 					const privateValue : any = _privates[prop]
 					return (accessor && typeof accessor.get === 'function')
-						? accessor.get() || privateValue
+						? /*::`*/this::accessor.get()/*::`*/ || privateValue
 						: privateValue
 				},
 				set (value : any) {
@@ -63,7 +63,7 @@ function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disab
 						throw new ReferenceError(errorMessage)
 					}
 					_privates[prop] = (accessor && typeof accessor.set === 'function')
-						? accessor.set(value) || value
+						? /*::`*/this::accessor.set(value)/*::`*/ || value
 						: value
 					this.observables.update(prop, _privates[prop])
 				}
