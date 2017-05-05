@@ -134,7 +134,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 			if (!regX.test(attr.value)) continue
 
 			const prop : string = attr.name
-			const bindOperatorRegX : RegExp = /::(\\w*)/ig
+			const bindOperatorRegX : RegExp = /::(\w*)/ig
 			const value : string = attr.value.replace(bindOperatorRegX, 'elem.$1')
 			const exp : Function = new Function('elem', `
 					let value = ${value}
