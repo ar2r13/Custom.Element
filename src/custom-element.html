@@ -1,0 +1,37 @@
+<link rel="import" href="templating/templating.html">
+<link rel="import" href="data-flow/data-flow.html">
+<script type="text/javascript">
+	'use strict'
+
+	function Custom(superClass) {
+		/* eslint-disable no-undef */
+		const mixins = [
+			Templating,
+			DataFlow
+		]
+		/* eslint-enable */
+
+		return class extends Custom.mix(superClass).with(...mixins) {
+			static get element() {
+				return super.element || this
+			}
+		}
+	}
+
+	Custom.mix = function (superClass) {
+		class Mixin {
+			constructor(superClass) {
+				this.superClass = superClass
+			}
+			with(...mixins) {
+				return mixins.reduce((c, mixin) => mixin(c), this.superClass) || this.superClass
+			}
+		}
+		return new Mixin(superClass)
+	}
+
+	Object.defineProperty(Custom, 'Element', {
+		get() { return Custom(HTMLElement) }
+	})
+
+</script>

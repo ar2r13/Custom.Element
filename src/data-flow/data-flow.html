@@ -1,0 +1,9 @@
+<script src="data-binding.js" charset="utf-8"></script>
+<script src="observed-properties.js" charset="utf-8"></script>
+<script type="text/javascript">
+	'use strict'
+	/* eslint-disable no-unused-vars, no-undef */
+	function DataFlow (SuperClass) {
+		return class extends dataBinding(observedProperties(SuperClass)) {}
+	}
+</script>

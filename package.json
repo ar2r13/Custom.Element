@@ -1,6 +1,6 @@
 {
-	"name": "lab",
-	"version": "0.1.0",
+	"name": "CustomElements",
+	"version": "0.2.0",
 	"license": "MIT",
 	"devDependencies": {
 		"babel-eslint": "^7.2.1",
@@ -12,12 +12,14 @@
 		"eslint": "^3.19.0",
 		"eslint-plugin-flowtype": "^2.30.4",
 		"eslint-plugin-html": "^2.0.1",
-		"flow-bin": "^0.43.1"
+		"flow-bin": "^0.43.1",
+		"polymer-bundler": "^2.0.0-pre.6"
 	},
 	"scripts": {
-		"postinstall": "npm start",
-		"start": "babel-html -s src -d dist -w",
+		"start": "babel-html -s src -d dist -D -w",
 		"test": "flow && eslint --ext .html,.js src",
-		"build": "npm test && babel-html -s src -d dist -m"
+		"prebuild": "rm -rf dist",
+		"build": "npm test && babel-html -s src -d dist -m -D",
+		"postbuild": "polymer-bundler --inline-scripts dist/custom-element.html > dist/custom-element.bundled.html"
 	}
 }
