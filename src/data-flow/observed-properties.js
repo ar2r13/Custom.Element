@@ -10,9 +10,8 @@ function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disab
 		subscribe(prop : string, handler : Function) {
 			let stack = this.stack[prop]
 			stack instanceof Array
-				?
-				stack.push :
-				stack = [handler]
+				? stack.push(handler)
+				: stack = [handler]
 			this.stack[prop] = stack
 		}
 		update(prop : string, data : any) {
@@ -57,11 +56,14 @@ function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disab
 						? /*::`*/this::accessor.get()/*::`*/ || privateValue
 						: privateValue
 				},
-				set (value : any) {
+				set (value : any) : any {
 					const _privates : ?Object = privates.get(this)
 					if(!(_privates instanceof Object)) {
 						throw new ReferenceError(errorMessage)
 					}
+
+					if(_privates[prop] === value) return value
+
 					_privates[prop] = (accessor && typeof accessor.set === 'function')
 						? /*::`*/this::accessor.set(value)/*::`*/ || value
 						: value
