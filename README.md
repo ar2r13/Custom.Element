@@ -8,7 +8,7 @@
 	<style>
 		/* styles */
 	</style>
-	<input type="text" value="this.userName" oninput="this.update">
+	<input type="text" value="this.userName" oninput="::this.userName = this.value">
 	[[this.userName]]
 </template>
 <script type="text/javascript">
@@ -19,10 +19,6 @@
 		constructor() {
 			super()
 			this.userName = 'Arthur'
-			this.input = this.shadowRoot.querySelector('input')
-		}
-		update() {
-			this.userName = this.input.value
 		}
 	}
 	window.customElements.define(HelloApp.is, HelloApp.element)
