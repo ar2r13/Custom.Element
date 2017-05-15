@@ -10,7 +10,7 @@ function Templating (SuperClass : HTMLElement) : Object { // eslint-disable-line
 	return class extends SuperClass {
 
 		static get template () : DocumentFragment {
-			const template : ?HTMLTemplateElement = ownerDocument.querySelector('template')
+			const template : ?HTMLTemplateElement = ownerDocument.querySelector('#' + this.is || 'template')
 			if(!template) throw new Error('Template not found')
 			return template.content.cloneNode(true)
 		}

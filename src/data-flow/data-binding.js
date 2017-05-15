@@ -89,7 +89,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 				const RegX : RegExp = /this[\.\[]+(\w+)/g
 				while((result = RegX.exec(ref))) {
 					if(observedProperties.includes(result[1])) {
-						this.observables.subscribe(result[1], value => /*::`*/this::setStamp(ref, value)/*::`*/)
+						this.observables.subscribe(result[1], value => /*::`*/this::setStamp(ref)/*::`*/)
 					}
 				}
 			}
@@ -98,7 +98,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 	function setStamp(ref : string, value : any) {
 		if(value == null) {
-			value = new Function(`return ${ref}`).call(this) || ''
+			value = new Function(`return ${ref}`).call(this)
 		}
 
 		const shadow : ShadowRoot = this.shadowRoot
@@ -108,7 +108,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 		if(!shadow) return
 
 		stampList[ref].forEach((node : Object, index : number) => {
-			const stampValue : string = value + ''
+			const stampValue : string = value == null ? '' : value + ''
 			shadow.contains(node)
 				? node.data = stampValue
 				: this.stamps[ref].splice(index, 1)

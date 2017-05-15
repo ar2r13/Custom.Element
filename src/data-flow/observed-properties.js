@@ -52,7 +52,8 @@ function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disab
 						throw new ReferenceError(errorMessage)
 					}
 					const privateValue : any = _privates[prop]
-					return (accessor && typeof accessor.get === 'function')
+					const accessorGet : boolean = accessor && typeof accessor.get === 'function'
+					return accessorGet
 						? /*::`*/this::accessor.get()/*::`*/ || privateValue
 						: privateValue
 				},
@@ -61,10 +62,28 @@ function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disab
 					if(!(_privates instanceof Object)) {
 						throw new ReferenceError(errorMessage)
 					}
+					const accessorSet : boolean = accessor && typeof accessor.set === 'function'
 
-					if(_privates[prop] === value) return value
+					if(_privates[prop] === value) {
+						return value
+					}
 
-					_privates[prop] = (accessor && typeof accessor.set === 'function')
+					if(typeof value === 'object') {
+						const _this : Object = this
+						value = new Proxy(value, {
+							set(target : Object, property : string, value : any) : any {
+								if(target[property] === value) return true
+								target[property] = value
+								_this.observables.update(prop, target)
+								if(accessorSet) {
+									/*::`*/_this::accessor.set(target)/*::`*/
+								}
+								return true
+							}
+						})
+					}
+
+					_privates[prop] = accessorSet
 						? /*::`*/this::accessor.set(value)/*::`*/ || value
 						: value
 					this.observables.update(prop, _privates[prop])
