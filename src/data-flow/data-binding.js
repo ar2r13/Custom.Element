@@ -129,12 +129,15 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 			const prop : string = attr.name
 			const value : string = attr.value.replace(dataBindRegX, '$.$1')
 			const exp : Function = new Function('$', `
-					this.${prop} = function () {
+					function exp () {
 						const value = ${value}
 						return typeof value === 'function'
-							? value.call($, this)
+							? value.call($, event, this)
 							: value
 					}
+					this.${prop} = '${prop}'.indexOf('on') === 0
+						? exp
+						: exp()
 				`).bind(elem)
 			const binding : exp = () => exp(this)
 			const observedProperties : Array <string> = this.constructor.observedProperties
