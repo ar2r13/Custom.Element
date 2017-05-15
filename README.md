@@ -8,17 +8,23 @@
 	<style>
 		/* styles */
 	</style>
-	<input type="text" value="this.userName" oninput="::this.userName = this.value">
-	[[this.userName]]
+	<input type="text" value="::this.userName" oninput="::this.userName = this.value">
+	[[this.greeting]]
 </template>
 <script type="text/javascript">
 	class HelloApp extends Custom.Element {
 		static get is () { return 'hello-app' }
-		static get observedProperties () { return ['userName'] }
+		static get observedProperties () { return ['userName', 'greeting'] }
 
 		constructor() {
 			super()
 			this.userName = 'Arthur'
+		}
+
+		set userName (value) {
+			this.greeting = value
+				? "Hello " + value
+				: ''
 		}
 	}
 	window.customElements.define(HelloApp.is, HelloApp.element)
