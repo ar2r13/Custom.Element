@@ -1,5 +1,5 @@
 {
-  "name": "Carboneum",
+  "name": "carboneum",
   "description": "Lightweight library to create your own custom HTML elements, using web standard Web Component API",
   "main": "carboneum.html",
   "authors": [
