@@ -1,7 +1,10 @@
 {
-  "name": "carboneum",
+  "name": "Carboneum",
+	"version": "0.3.3",
   "description": "Lightweight library to create your own custom HTML elements, using web standard Web Component API",
-  "main": "carboneum.html",
+  "main": [
+		"carboneum.html"
+	],
   "authors": [
     "Arthur Lavrischev <ar2r13lawrence@gmail.com>"
   ],
