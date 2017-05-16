@@ -1,0 +1,17 @@
+{
+  "name": "Carboneum",
+  "description": "Lightweight library to create your own custom HTML elements, using web standard Web Component API",
+  "main": "carboneum.html",
+  "authors": [
+    "Arthur Lavrischev <ar2r13lawrence@gmail.com>"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/ar2r13/Carboneum",
+  "ignore": [
+    "node_modules",
+    "bower_components",
+		"src",
+		"**/.*",
+		"package.json"
+  ]
+}

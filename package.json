@@ -1,5 +1,6 @@
 {
-	"name": "CustomElements",
+	"name": "Carboneum",
+	"description": "Lightweight library to create your own custom HTML elements, using web standard Web Component API",
 	"version": "0.3.0",
 	"license": "MIT",
 	"devDependencies": {
@@ -16,10 +17,10 @@
 		"polymer-bundler": "^2.0.0-pre.6"
 	},
 	"scripts": {
-		"start": "babel-html -s src -d dist -D -w",
+		"start": "babel-html -s src -d lib -D -w",
 		"test": "flow && eslint --ext .html,.js src",
 		"prebuild": "rm -rf dist",
-		"build": "npm test && babel-html -s src -d dist -m -D",
-		"postbuild": "polymer-bundler --inline-scripts dist/custom-element.html > dist/custom-element.bundled.html"
+		"build": "npm test && babel-html -s src -d lib -m -D",
+		"postbuild": "polymer-bundler --inline-scripts carboneum.html > carboneum.bundled.html"
 	}
 }
