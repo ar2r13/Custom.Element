@@ -1,10 +1,10 @@
-# Project Carboneum
+# Project Carbonium
 
-*Carboneum* - is a lightweight library to create your own custom HTML elements, using web standard [Web Component](https://www.w3.org/standards/techs/components#w3c_all) API.
+*Carbonium* - is a lightweight library to create your own custom HTML elements, using web standard [Web Component](https://www.w3.org/standards/techs/components#w3c_all) API.
 
 ###### *Installing:*
 ```bash
-bower i carboneum --save
+bower i carbonium --save
 
 # For older browser you need to install polyfill (https://github.com/webcomponents/webcomponentsjs)
 bower i webcomponentsjs --save
@@ -29,7 +29,7 @@ index.html
 ```html
 my-component.html
 
-<link rel="import" href="bower_components/carboneum/carboneum.html">
+<link rel="import" href="bower_components/carbonium/carbonium.html">
 
 <template>
 	<style>
