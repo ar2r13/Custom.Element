@@ -20,7 +20,7 @@
 		"start": "babel-html -s src -d lib -D -w",
 		"test": "flow && eslint --ext .html,.js src",
 		"prebuild": "rm -rf dist",
-		"build": "npm test && babel-html -s src -d lib -m -D",
-		"postbuild": "polymer-bundler --inline-scripts carboneum.html > carboneum.bundled.html"
+		"build": "npm test && babel-html -s src -d dist -m -D",
+		"postbuild": "polymer-bundler --inline-scripts dist/carbonium.html > dist/carbonium.bundled.html"
 	}
 }
