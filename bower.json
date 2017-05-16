@@ -1,6 +1,6 @@
 {
   "name": "Carboneum",
-	"version": "0.3.3",
+	"version": "0.3.3b",
   "description": "Lightweight library to create your own custom HTML elements, using web standard Web Component API",
   "main": [
 		"carboneum.html"

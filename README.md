@@ -2,18 +2,47 @@
 
 *Carboneum* - is a lightweight library to create your own custom HTML elements, using web standard [Web Component](https://www.w3.org/standards/techs/components#w3c_all) API.
 
-###### *Example:*
+###### *Installing:*
+```bash
+bower i carboneum --save
+
+# For older browser you need to install polyfill (https://github.com/webcomponents/webcomponentsjs)
+bower i webcomponentsjs --save
+```
+
+###### *Usage:*
 ```html
+index.html
+
+<html lang="en">
+	<head>
+		...
+		<script src="bower_components/webcomponentsjs/webcomponents-loader.js" defer></script>
+		<link rel="import" async href="my-component.html">
+	</head>
+	<body>
+		<my-component></my-component>
+	</body>
+</html>
+```
+
+```html
+my-component.html
+
+<link rel="import" href="bower_components/carboneum/carboneum.html">
+
 <template>
 	<style>
 		/* styles */
 	</style>
-	<input type="text" value="::this.userName" oninput="::this.userName = this.value">
-	[[this.greeting]]
+	T<input type="text" value="::this.userName" oninput="::this.userName = this.value">
+	[[::this.greeting]]
 </template>
+
 <script type="text/javascript">
-	class HelloApp extends Custom.Element {
-		static get is () { return 'hello-app' }
+	class MyComponent extends Custom.Element {
+
+		static get is() { return 'my-component' }
 		static get observedProperties () { return ['userName', 'greeting'] }
 
 		constructor() {
@@ -26,7 +55,8 @@
 				? "Hello " + value
 				: ''
 		}
+
 	}
-	window.customElements.define(HelloApp.is, HelloApp.element)
+	window.customElements.define(MyComponent.is, MyComponent.element)
 </script>
 ```
