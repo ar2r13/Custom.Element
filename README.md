@@ -35,8 +35,8 @@ my-component.html
 	<style>
 		/* styles */
 	</style>
-	T<input type="text" value="::this.userName" oninput="::this.userName = this.value">
-	[[::this.greeting]]
+	<input type="text" value="::this.userName" oninput="::this.userName = this.value">
+	((this.greeting))
 </template>
 
 <script type="text/javascript">
