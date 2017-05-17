@@ -6,8 +6,6 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	const bindings : WeakMap<Element, Array<Function>> = new WeakMap()
 	const stamps : WeakMap<Element, Object> = new WeakMap()
 
-	const dataBindRegX : RegExp = /::this[\.\[]+(\w+)/g
-
 	const stampErrorMessage : string = '[WebComponent] Something went wrong. No stamps storage found.'
 
 	// flow-ignore-line
@@ -105,7 +103,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 		const newValue : any = (node : Text) : any => {
 			value = value == null
-				? new Function('$', `with($) { return ${ref} }`).call(this, node)
+				? /*::`*/this::evluatedExp(node, ref)/*::`*/
 				: value
 			return value
 		}
@@ -122,7 +120,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 		})
 	}
 
-	function detectBinding(elem : Element) {
+	function detectBinding(elem : {[string] : any}) {
 		const bindingList : ?Array<Function> = bindings.get(this)
 		const errorMessage : string = '[WebComponent] Something went wrong. No stamps storage found.'
 
@@ -130,29 +128,40 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 		for (let i = 0; i < elem.attributes.length; i++) {
 			const attr : Object = elem.attributes[i]
-
-			if (!dataBindRegX.test(attr.value)) continue
-
 			const prop : string = attr.name
-			const value : string = attr.value.replace(dataBindRegX, '$.$1')
-			const exp : Function = new Function('$', `
-					function exp () {
-						const value = ${value}
-						return typeof value === 'function'
-							? value.call($, event, this)
-							: value
-					}
-					this.${prop} = '${prop}'.indexOf('on') === 0
-						? exp
-						: exp()
-				`).bind(elem)
-			const binding : exp = () => exp(this)
+			const prefix : string = prop.substr(0, 2)
+
+			const availablePrefixes : Array<string> = [
+				'on',
+				'::'
+			]
+
+			if(!attr.value.length || !availablePrefixes.includes(prefix)) continue
+
+			const binding : Function = () => {
+				const value : any = /*::`*/this::evluatedExp(elem, attr.value)/*::`*/
+				switch (prefix) {
+					case 'on':
+						elem[prop] = (() => typeof value === 'function'
+								? value.call(this, event, elem)
+								: /*::`*/this::evluatedExp(elem, attr.value)/*::`*/
+						).bind(this)
+						break
+					case '::':
+						elem.removeAttribute(prop)
+						elem[prop.substr(2)] = value
+						break
+					default:
+						return
+				}
+			}
+
 			const observedProperties : Array <string> = this.constructor.observedProperties
 
 			if (Array.isArray(observedProperties)) {
 				let result
 				const RegX : RegExp = /\$[\.\[]+(\w+)/g
-				while((result = RegX.exec(value))) {
+				while((result = RegX.exec(attr.value))) {
 					if(observedProperties.includes(result[1])) {
 						this.observables.subscribe(result[1], binding)
 					}
@@ -161,5 +170,9 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 			bindingList.push(binding)
 		}
+	}
+
+	function evluatedExp (context : Element, exp : string) : any {
+		return new Function('$', `with($) { return ${exp} }`).call(this, context)
 	}
 }

@@ -35,7 +35,7 @@ my-component.html
 	<style>
 		/* styles */
 	</style>
-	<input type="text" value="::this.userName" oninput="::this.userName = this.value">
+	<input type="text" ::value="this.userName" oninput="this.userName = value">
 	((this.greeting))
 </template>
 
