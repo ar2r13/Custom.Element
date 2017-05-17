@@ -17,7 +17,7 @@
 		"polymer-bundler": "^2.0.0-pre.6"
 	},
 	"scripts": {
-		"start": "babel-html -s src -d lib -D -w",
+		"start": "babel-html -s src -d dist -D -w",
 		"test": "flow && eslint --ext .html,.js src",
 		"prebuild": "rm -rf dist",
 		"build": "npm test && babel-html -s src -d dist -m -D",
