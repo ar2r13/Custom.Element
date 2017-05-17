@@ -54,7 +54,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	function detectStamp(node : Text) {
 		if(node.nodeType !== 3 || !node.data.trim()) return
 
-		const stampSelector : RegExp = /\[\[(.*::this[\.\[]+\w+.*)]]/gim
+		const stampSelector : RegExp = /(\(\(\s*\w+.*\)\))/gim
 		const chunks : Array<string> = node.data.split(stampSelector)
 
 		if(chunks.length <= 1) return
@@ -67,16 +67,16 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 		node.remove()
 
 		chunks.forEach((chunck : string) => {
-			const ref : any = chunck.replace(dataBindRegX, 'this.$1')
-			const data : string = ref === chunck ? chunck : ''
+			const ref : any = chunck.match(stampSelector)
+			const data : string = ref ? '' : chunck
 			const newNode : Text = document.createTextNode(data)
 
 			parentNode.insertBefore(newNode, nextNode)
+
 			if(data || !ref) return
 
 			const _stamps : ?Object = stamps.get(this)
 			if(!_stamps) throw new ReferenceError(stampErrorMessage)
-
 			const stampList : Array<Text> = _stamps[ref]
 
 			Array.isArray(stampList)
@@ -97,18 +97,25 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	}
 
 	function setStamp(ref : string, value : any) {
-		if(value == null) {
-			value = new Function(`return ${ref}`).call(this)
-		}
-
 		const shadow : ShadowRoot = this.shadowRoot
 		const stampList : ?Object = stamps.get(this)
 
 		if(!stampList) throw new ReferenceError(stampErrorMessage)
 		if(!shadow) return
 
-		stampList[ref].forEach((node : Object, index : number) => {
-			const stampValue : string = value == null ? '' : value + ''
+		const newValue : any = (node : Text) : any => {
+			value = value == null
+				? new Function('$', `with($) { return ${ref} }`).call(this, node)
+				: value
+			return value
+		}
+
+		stampList[ref].forEach((node : Text, index : number) => {
+			const stampValue : string = newValue(node) == null
+				? ''
+				: typeof value === 'object'
+					? JSON.stringify(value)
+					: value + ''
 			shadow.contains(node)
 				? node.data = stampValue
 				: this.stamps[ref].splice(index, 1)
