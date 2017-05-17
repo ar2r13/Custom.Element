@@ -36,24 +36,18 @@ my-component.html
 		/* styles */
 	</style>
 	<input type="text" ::value="this.userName" oninput="this.userName = value">
-	((this.greeting))
+	((this.userName ? 'Hello, ' + this.userName : ''))
 </template>
 
 <script type="text/javascript">
 	class MyComponent extends Custom.Element {
 
 		static get is() { return 'my-component' }
-		static get observedProperties () { return ['userName', 'greeting'] }
+		static get observedProperties () { return ['userName'] }
 
 		constructor() {
 			super()
 			this.userName = 'Arthur'
-		}
-
-		set userName (value) {
-			this.greeting = value
-				? "Hello " + value
-				: ''
 		}
 
 	}
