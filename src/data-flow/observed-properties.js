@@ -1,7 +1,7 @@
 // @flow
 'use strict'
 
-function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disable-line no-unused-vars
+function ObservedProperties(SuperClass : HTMLElement) : HTMLElement { // eslint-disable-line no-unused-vars
 
 	const privates : WeakMap<Element, Object> = new WeakMap()
 
@@ -36,7 +36,7 @@ function observedProperties(SuperClass : HTMLElement) : Object { // eslint-disab
 		}
 	}
 
-	function observedPropertiesDecorator(target : Object) : HTMLElement { // eslint-disable-line no-unused-vars
+	function observedPropertiesDecorator(target : Object) : HTMLElement {
 		const observedProperties : Array<string> = target.observedProperties
 		if (!(observedProperties instanceof Array)) return target
 

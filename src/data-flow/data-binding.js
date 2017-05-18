@@ -1,12 +1,13 @@
 // @flow
 'use strict'
 
-function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line no-unused-vars
+function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line no-unused-vars
 
 	const bindings : WeakMap<Element, Array<Function>> = new WeakMap()
 	const stamps : WeakMap<Element, Object> = new WeakMap()
 
 	const stampErrorMessage : string = '[WebComponent] Something went wrong. No stamps storage found.'
+	const rootPropRegX : RegExp = /this[\.\[]+(\w+)/g
 
 	// flow-ignore-line
 	return class extends SuperClass {
@@ -84,8 +85,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 			const observedProperties : Array<string> = this.constructor.observedProperties
 			if(Array.isArray(observedProperties)) {
 				let result
-				const RegX : RegExp = /this[\.\[]+(\w+)/g
-				while((result = RegX.exec(ref))) {
+				while((result = rootPropRegX.exec(ref))) {
 					if(observedProperties.includes(result[1])) {
 						this.observables.subscribe(result[1], value => /*::`*/this::setStamp(ref)/*::`*/)
 					}
@@ -160,8 +160,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 			if (Array.isArray(observedProperties)) {
 				let result
-				const RegX : RegExp = /\$[\.\[]+(\w+)/g
-				while((result = RegX.exec(attr.value))) {
+				while((result = rootPropRegX.exec(attr.value))) {
 					if(observedProperties.includes(result[1])) {
 						this.observables.subscribe(result[1], binding)
 					}
