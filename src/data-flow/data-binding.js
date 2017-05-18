@@ -52,7 +52,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	function detectStamp(node : Text) {
 		if(node.nodeType !== 3 || !node.data.trim()) return
 
-		const stampSelector : RegExp = /(\(\(\s*\w+.*\)\))/gim
+		const stampSelector : RegExp = /(\(\(.+?\)\))/gim
 		const chunks : Array<string> = node.data.split(stampSelector)
 
 		if(chunks.length <= 1) return
