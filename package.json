@@ -19,8 +19,7 @@
 	"scripts": {
 		"start": "babel-html -s src -d dist -D -w",
 		"test": "flow && eslint --ext .html,.js src",
-		"prebuild": "rm -rf dist",
-		"build": "npm test && babel-html -s src -d dist -m -D",
-		"postbuild": "polymer-bundler --inline-scripts dist/carbonium.html > dist/carbonium.bundled.html"
+		"build": "npm test && babel-html -s src -d . -m -D",
+		"postbuild": "polymer-bundler --inline-scripts carbonium.html > carbonium.bundled.html"
 	}
 }
