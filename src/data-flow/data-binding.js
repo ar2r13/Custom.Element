@@ -21,12 +21,8 @@ function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 			let node
 			while ((node = nodeIterator.nextNode())) {
-				if(node.nodeType === 1 && node.attributes.length) { // element
-					elements.push(node)
-				}
-				if(node.nodeType === 3 && node.data) { // text node
-					textNodes.push(node)
-				}
+				if(node.nodeType === 1 && node.attributes.length) elements.push(node) //element
+				if(node.nodeType === 3 && node.data) textNodes.push(node) // text node
 			}
 
 			if(elements.length) {
@@ -103,7 +99,7 @@ function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 		const newValue : any = (node : Text) : any => {
 			value = value == null
-				? /*::`*/this::evluatedExp(node, ref)/*::`*/
+				? /*::`*/this::evaluatedExp(node, ref)/*::`*/
 				: value
 			return value
 		}
@@ -139,12 +135,12 @@ function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 			if(!attr.value.length || !availablePrefixes.includes(prefix)) continue
 
 			const binding : Function = () => {
-				const value : any = /*::`*/this::evluatedExp(elem, attr.value)/*::`*/
+				const value : any = /*::`*/this::evaluatedExp(elem, attr.value)/*::`*/
 				switch (prefix) {
 					case 'on':
 						elem[prop] = (() => typeof value === 'function'
 								? value.call(this, event, elem)
-								: /*::`*/this::evluatedExp(elem, attr.value)/*::`*/
+								: /*::`*/this::evaluatedExp(elem, attr.value)/*::`*/
 						).bind(this)
 						break
 					case '::':
@@ -171,18 +167,8 @@ function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 		}
 	}
 
-	function evluatedExp (context : Element, exp : string) : any {
-		return new Function('$', `
-			let v
-			with($) {
-				try {
-					v = ${exp}
-				} catch(e) {
-					console.error(e)
-					return '[' + e.name + ']: ' + e.message
-				}
-				return v
-			}`
-		).call(this, context)
+	function evaluatedExp (context : Element, exp : string) : any {
+		return new Function('$', `let v;with($){try{v=${exp}}catch(e){console.error(e);return '['+e.name+']: '+e.message}return v}`)
+			.call(this, context)
 	}
 }

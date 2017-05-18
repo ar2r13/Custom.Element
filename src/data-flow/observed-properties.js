@@ -28,7 +28,10 @@ function ObservedProperties(SuperClass : HTMLElement) : HTMLElement { // eslint-
 			const observedProperties : Array<string> = this.constructor.observedProperties
 			if (observedProperties instanceof Array) {
 				privates.set(this, {})
-				this.observables = new Observable()
+				Object.defineProperty(this, 'observables', {
+					enumerable: false,
+					value: new Observable()
+				})
 			}
 		}
 		static get element() : typeof SuperClass {
