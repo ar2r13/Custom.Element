@@ -34,7 +34,12 @@ module.exports = {
             "error",
             "never"
         ],
-        "no-console": 0,
+        "no-console": [
+			"error",
+			{
+				"allow": [ "warn", "error", "info" ]
+			}
+		],
 		"no-unused-vars": [
 			2,
 			{ "args": "none" }

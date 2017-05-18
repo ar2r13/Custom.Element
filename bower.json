@@ -1,9 +1,9 @@
 {
   "name": "Carbonium",
-	"version": "0.3.3b",
+	"version": "0.4.0b",
   "description": "Lightweight library to create your own custom HTML elements, using web standard Web Component API",
   "main": [
-		"carbonium.html"
+		"dist/carbonium.html"
 	],
   "authors": [
     "Arthur Lavrischev <ar2r13lawrence@gmail.com>"
@@ -11,8 +11,6 @@
   "license": "MIT",
   "homepage": "https://github.com/ar2r13/Carbonium",
   "ignore": [
-    "node_modules",
-    "bower_components",
 		"src",
 		"**/.*",
 		"package.json"

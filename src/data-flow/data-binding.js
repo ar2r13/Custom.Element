@@ -1,14 +1,13 @@
 // @flow
 'use strict'
 
-function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line no-unused-vars
+function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line no-unused-vars
 
 	const bindings : WeakMap<Element, Array<Function>> = new WeakMap()
 	const stamps : WeakMap<Element, Object> = new WeakMap()
 
-	const dataBindRegX : RegExp = /::this[\.\[]+(\w+)/g
-
 	const stampErrorMessage : string = '[WebComponent] Something went wrong. No stamps storage found.'
+	const rootPropRegX : RegExp = /this[\.\[]+(\w+)/g
 
 	// flow-ignore-line
 	return class extends SuperClass {
@@ -22,12 +21,8 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 			let node
 			while ((node = nodeIterator.nextNode())) {
-				if(node.nodeType === 1 && node.attributes.length) { // element
-					elements.push(node)
-				}
-				if(node.nodeType === 3 && node.data) { // text node
-					textNodes.push(node)
-				}
+				if(node.nodeType === 1 && node.attributes.length) elements.push(node) //element
+				if(node.nodeType === 3 && node.data) textNodes.push(node) // text node
 			}
 
 			if(elements.length) {
@@ -54,7 +49,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	function detectStamp(node : Text) {
 		if(node.nodeType !== 3 || !node.data.trim()) return
 
-		const stampSelector : RegExp = /\[\[(.*::this[\.\[]+\w+.*)]]/gim
+		const stampSelector : RegExp = /(\(\(.+?\)\))/gim
 		const chunks : Array<string> = node.data.split(stampSelector)
 
 		if(chunks.length <= 1) return
@@ -67,16 +62,16 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 		node.remove()
 
 		chunks.forEach((chunck : string) => {
-			const ref : any = chunck.replace(dataBindRegX, 'this.$1')
-			const data : string = ref === chunck ? chunck : ''
+			const ref : any = chunck.match(stampSelector)
+			const data : string = ref ? '' : chunck
 			const newNode : Text = document.createTextNode(data)
 
 			parentNode.insertBefore(newNode, nextNode)
+
 			if(data || !ref) return
 
 			const _stamps : ?Object = stamps.get(this)
 			if(!_stamps) throw new ReferenceError(stampErrorMessage)
-
 			const stampList : Array<Text> = _stamps[ref]
 
 			Array.isArray(stampList)
@@ -86,8 +81,7 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 			const observedProperties : Array<string> = this.constructor.observedProperties
 			if(Array.isArray(observedProperties)) {
 				let result
-				const RegX : RegExp = /this[\.\[]+(\w+)/g
-				while((result = RegX.exec(ref))) {
+				while((result = rootPropRegX.exec(ref))) {
 					if(observedProperties.includes(result[1])) {
 						this.observables.subscribe(result[1], value => /*::`*/this::setStamp(ref)/*::`*/)
 					}
@@ -97,25 +91,32 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	}
 
 	function setStamp(ref : string, value : any) {
-		if(value == null) {
-			value = new Function(`return ${ref}`).call(this)
-		}
-
 		const shadow : ShadowRoot = this.shadowRoot
 		const stampList : ?Object = stamps.get(this)
 
 		if(!stampList) throw new ReferenceError(stampErrorMessage)
 		if(!shadow) return
 
-		stampList[ref].forEach((node : Object, index : number) => {
-			const stampValue : string = value == null ? '' : value + ''
+		const newValue : any = (node : Text) : any => {
+			value = value == null
+				? /*::`*/this::evaluatedExp(node, ref)/*::`*/
+				: value
+			return value
+		}
+
+		stampList[ref].forEach((node : Text, index : number) => {
+			const stampValue : string = newValue(node) == null
+				? ''
+				: typeof value === 'object'
+					? JSON.stringify(value)
+					: value + ''
 			shadow.contains(node)
 				? node.data = stampValue
 				: this.stamps[ref].splice(index, 1)
 		})
 	}
 
-	function detectBinding(elem : Element) {
+	function detectBinding(elem : {[string] : any}) {
 		const bindingList : ?Array<Function> = bindings.get(this)
 		const errorMessage : string = '[WebComponent] Something went wrong. No stamps storage found.'
 
@@ -123,29 +124,39 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 		for (let i = 0; i < elem.attributes.length; i++) {
 			const attr : Object = elem.attributes[i]
-
-			if (!dataBindRegX.test(attr.value)) continue
-
 			const prop : string = attr.name
-			const value : string = attr.value.replace(dataBindRegX, '$.$1')
-			const exp : Function = new Function('$', `
-					function exp () {
-						const value = ${value}
-						return typeof value === 'function'
-							? value.call($, event, this)
-							: value
-					}
-					this.${prop} = '${prop}'.indexOf('on') === 0
-						? exp
-						: exp()
-				`).bind(elem)
-			const binding : exp = () => exp(this)
+			const prefix : string = prop.substr(0, 2)
+
+			const availablePrefixes : Array<string> = [
+				'on',
+				'::'
+			]
+
+			if(!attr.value.length || !availablePrefixes.includes(prefix)) continue
+
+			const binding : Function = () => {
+				const value : any = /*::`*/this::evaluatedExp(elem, attr.value)/*::`*/
+				switch (prefix) {
+					case 'on':
+						elem[prop] = (() => typeof value === 'function'
+								? value.call(this, event, elem)
+								: /*::`*/this::evaluatedExp(elem, attr.value)/*::`*/
+						).bind(this)
+						break
+					case '::':
+						elem.removeAttribute(prop)
+						elem[prop.substr(2)] = value
+						break
+					default:
+						return
+				}
+			}
+
 			const observedProperties : Array <string> = this.constructor.observedProperties
 
 			if (Array.isArray(observedProperties)) {
 				let result
-				const RegX : RegExp = /\$[\.\[]+(\w+)/g
-				while((result = RegX.exec(value))) {
+				while((result = rootPropRegX.exec(attr.value))) {
 					if(observedProperties.includes(result[1])) {
 						this.observables.subscribe(result[1], binding)
 					}
@@ -154,5 +165,10 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 
 			bindingList.push(binding)
 		}
+	}
+
+	function evaluatedExp (context : Element, exp : string) : any {
+		return new Function('$', `let v;with($){try{v=${exp}}catch(e){console.error(e);return '['+e.name+']: '+e.message}return v}`)
+			.call(this, context)
 	}
 }

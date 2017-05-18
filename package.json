@@ -1,7 +1,7 @@
 {
 	"name": "Carbonium",
 	"description": "Lightweight library to create your own custom HTML elements, using web standard Web Component API",
-	"version": "0.3.3b",
+	"version": "0.4.0b",
 	"license": "MIT",
 	"devDependencies": {
 		"babel-eslint": "^7.2.1",
