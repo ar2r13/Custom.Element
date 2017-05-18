@@ -173,6 +173,17 @@ function dataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	}
 
 	function evluatedExp (context : Element, exp : string) : any {
-		return new Function('$', `with($) { return ${exp} }`).call(this, context)
+		return new Function('$', `
+			let v
+			with($) {
+				try {
+					v = ${exp}
+				} catch(e) {
+					console.error(e)
+					return '[' + e.name + ']: ' + e.message
+				}
+				return v
+			}`
+		).call(this, context)
 	}
 }
