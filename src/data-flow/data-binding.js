@@ -151,8 +151,6 @@ function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 						elem.removeAttribute(prop)
 						elem[prop.substr(2)] = value
 						break
-					default:
-						return
 				}
 			}
 
