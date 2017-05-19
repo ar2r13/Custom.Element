@@ -13,16 +13,20 @@ function DataBinding(SuperClass : HTMLElement) : Object { // eslint-disable-line
 	return class extends SuperClass {
 		constructor() {
 			super()
-
 			const nodeIterator : NodeIterator <ShadowRoot, Element> = window.document.createNodeIterator(this.shadowRoot, NodeFilter.SHOW_ALL)
-
 			const elements : Array<Element> = []
 			const textNodes : Array<Element> = []
 
 			let node
 			while ((node = nodeIterator.nextNode())) {
-				if(node.nodeType === 1 && node.attributes.length) elements.push(node) //element
-				if(node.nodeType === 3 && node.data) textNodes.push(node) // text node
+				if(node.nodeType === 1 && node.attributes.length) {
+					elements.push(node) //element
+					continue
+				}
+				if(node.nodeType === 3 && node.data) {
+					textNodes.push(node) // text node
+					continue
+				}
 			}
 
 			if(elements.length) {
