@@ -1,4 +1,4 @@
-# Project Custom.Element
+# Custom.Element
 
 *Custom.Element* - is a lightweight library to create your own custom HTML elements, using web standard [Web Component](https://www.w3.org/standards/techs/components#w3c_all) API.
 
